@@ -3,7 +3,7 @@
 import os,sys,urllib2,re
 
 # 抓取 标题
-home = 'http://my.hupu.com/jzgk/photo/a74456-1.html'
+home = r'http://my.hupu.com/jzgk/photo/a75782-1.html'
 homepage = urllib2.urlopen(home).read().decode('gb2312').encode('utf-8')
 title    = re.search(r'<title>(.+)</title>',homepage)
 print title.group(1)
