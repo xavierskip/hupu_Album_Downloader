@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 #coding: utf-8
+#author: xavierskip
+#date:10-13-2012
+'''
+issues:
+	抓取时没有的封面图没有去除，总共有几页图就会多几张图
+todo:
+	去除重复的图片 
+'''
 import os,sys,urllib2,re
 
 def get_pages(home,homepage):
@@ -22,17 +30,22 @@ def url_list(content):
 	return url_list
 
 def tourls(url_list):
-	u_str = ' '.join(url_list)
-	u_str = re.sub('small\.','big.',u_str)
-	return u_str
+	url = '\n'.join(url_list)
+	url = re.sub('small\.','big.',url)
+	return url
 
 def dowm_img(urls):
 	pass
 
 def main():
-	#home = sys.argv[1]
-	home = r'http://my.hupu.com/McGrady1jia/photo/a81209-1.html'
+	#脚本可带url参数
+	if len(sys.argv)<=1:
+		home = r'http://my.hupu.com/jzgk/photo/a75782-1.html' #脚本内置虎扑相册地址
+	else:
+		home = sys.argv[1]
 	homepage = urllib2.urlopen(home).read()
+	title    = re.search(r'<title>(.+)</title>',homepage).group(1)
+	print '正在下载『%s』相册' %title
 	page_list = get_pages(home,homepage)
 	content = ''
 	for i in page_list:
@@ -41,6 +54,11 @@ def main():
 	U_list = url_list(content)
 	urls = tourls(U_list)
 	print urls
+	url_file = open('urls','w') #追加 w+
+	try:
+		url_file.write(urls)
+	finally:
+		url_file.close()
 	#os.system('wget %s' %urls)
 
 if __name__ == '__main__':
