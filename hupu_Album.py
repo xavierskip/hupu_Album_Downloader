@@ -40,12 +40,12 @@ def dowm_img(urls):
 def main():
 	#脚本可带url参数
 	if len(sys.argv)<=1:
-		home = r'http://my.hupu.com/jzgk/photo/a75782-1.html' #脚本内置虎扑相册地址
+		home = r'http://my.hupu.com/jzgk/photo/a74456-1.html' #脚本内置虎扑相册地址
 	else:
 		home = sys.argv[1]
 	homepage = urllib2.urlopen(home).read()
 	title    = re.search(r'<title>(.+)</title>',homepage).group(1)
-	print '正在下载『%s』相册' %title
+	print '正在抓取-%s-相册' %title.decode('gb2312').encode('utf-8')
 	page_list = get_pages(home,homepage)
 	content = ''
 	for i in page_list:

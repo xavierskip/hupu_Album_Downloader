@@ -3,13 +3,15 @@
 import os,sys,urllib2,re
 
 # 抓取 标题
-home = r'http://my.hupu.com/ghettoTelfair/photo/a202289-1.html'
+home = 'http://my.hupu.com/jzgk/photo/a74456-1.html'
 homepage = urllib2.urlopen(home).read().decode('gb2312').encode('utf-8')
 title    = re.search(r'<title>(.+)</title>',homepage)
 print title.group(1)
 t = title.group(1)
-print u'正在下载『%s』相册' %t
-print u'什么问题！！'
+print '正在下载『%s』相册' %t
+print '什么问题！！'
+
+
 '''
 # 带参数
 if len(sys.argv)<=1:
