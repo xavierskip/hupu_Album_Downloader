@@ -1,20 +1,20 @@
 #!/usr/bin/env python
-#coding: utf-8
+#coding: GBK
 #author: xavierskip
 #date:10-13-2012
 '''
 issues:
-	æŠ“å–æ—¶æ¯é¡µçš„å°é¢å›¾æ²¡æœ‰å»é™¤ï¼Œæ€»å…±æœ‰å‡ é¡µå›¾å°±ä¼šå¤šå‡ºå‡ å¼ å›¾
-	æ­£åˆ™åªåŒ¹é…å‡ºjpg|gif|png|jpegæ ¼å¼çš„å›¾ç‰‡ï¼Œè¿˜æœ‰å…¶ä»–çš„æ ¼å¼ä¹ˆï¼Ÿ
+	×¥È¡Ê±Ã¿Ò³µÄ·âÃæÍ¼Ã»ÓĞÈ¥³ı£¬×Ü¹²ÓĞ¼¸Ò³Í¼¾Í»á¶à³ö¼¸ÕÅÍ¼
+	ÕıÔòÖ»Æ¥Åä³öjpg|gif|png|jpeg¸ñÊ½µÄÍ¼Æ¬£¬»¹ÓĞÆäËûµÄ¸ñÊ½Ã´£¿
 todo:
-	å»é™¤é‡å¤çš„å›¾ç‰‡url
+	È¥³ıÖØ¸´µÄÍ¼Æ¬url
 '''
 import os,sys,urllib2,re
 
 def get_pages(home,homepage):
 	match = re.match(r'http://my\.hupu\.com([\S]+?)(?:\-[\d]\.html|\.html)',home) 
 	if match == None:
-		print 'some thing wrong!\nè¯´å¥½äº†ä¸è¦æ‹¿ä¹±ä¸ƒå…«ç³Ÿçš„urlæ¥è°ƒæˆæˆ‘çš„ï¼'
+		print 'some thing wrong!\nËµºÃÁË²»ÒªÄÃÂÒÆß°ËÔãµÄurlÀ´µ÷Ï·ÎÒµÄ£¡'
 		exit()
 	path = match.group(1)    #Album path
 	pat  = path+ r'-([\d]+).html(?:\'|\")>'
@@ -23,8 +23,8 @@ def get_pages(home,homepage):
 		page_list = [home]
 		return page_list
 	else:
-		P_max = int(P_nums[-1])    #æœ‰å¤šå°‘é¡µ
-		#ç”Ÿæˆæ‰€æœ‰ç›¸å†Œé¡µé¢ï¼Œè¿˜å¥½éƒ½æ˜¯æœ‰è§„å¾‹çš„ã€‚æ±—|||
+		P_max = int(P_nums[-1])    #ÓĞ¶àÉÙÒ³
+		#Éú³ÉËùÓĞÏà²áÒ³Ãæ£¬»¹ºÃ¶¼ÊÇÓĞ¹æÂÉµÄ¡£º¹|||
 		page_list = [r'http://my.hupu.com%s-%d.html' %(path,i) for i in xrange(1,P_max+1)]
 		return page_list
 
@@ -37,7 +37,7 @@ def get_content(url):
 def get_urls(content):
 	pat = r'http://i[\d]{1}\.hoopchina\.com\.cn/.+small\.(?:jpg|gif|png|jpeg)'
 	url_list = re.findall(pat,content)    #parse img url
-	print 'å¾—åˆ°%då¼ å›¾ç‰‡URL' %len(url_list)
+	print 'µÃµ½%dÕÅÍ¼Æ¬URL' %len(url_list)
 	urls = '\n'.join(url_list)
 	urls = re.sub(r'small\.',r'big.',urls)
 	return urls
@@ -46,28 +46,28 @@ def dowm_img(urls):
 	pass
 
 def main():
-	#è„šæœ¬å¯å¸¦urlå‚æ•°
+	#½Å±¾¿É´øurl²ÎÊı
 	if len(sys.argv)<=1:
-		home = r'http://my.hupu.com/jackson817/photo/a82914-1.html'    #è„šæœ¬å†…ç½®è™æ‰‘ç›¸å†Œåœ°å€
+		home = r'http://my.hupu.com/jackson817/photo/a82914-1.html'    #½Å±¾ÄÚÖÃ»¢ÆËÏà²áµØÖ·
 	else:
 		home = sys.argv[1]
-	homepage = urllib2.urlopen(home).read().decode('gb2312').encode('utf-8') #å­—ç¬¦ç¼–ç çœŸçƒ¦äºº
+	homepage = urllib2.urlopen(home).read()    #×Ö·û±àÂëÕæ·³ÈË
 	title    = re.search(r'<title>(.+)</title>',homepage).group(1)
-	print 'æ­£åœ¨æŠ“å–ç›¸å†Œ>>>ã€%sã€' %title
-	page_list = get_pages(home,homepage)    #å¾—åˆ°ç›¸å†Œçš„æ‰€æœ‰é¡µé¢
+	print 'ÕıÔÚ×¥È¡Ïà²á>>>¡º%s¡»' %title
+	page_list = get_pages(home,homepage)    #µÃµ½Ïà²áµÄËùÓĞÒ³Ãæ
 	content = ''
 	for i in page_list:
-		content +=get_content(i)     #å¾—åˆ°æ‰€æœ‰é¡µé¢å†…å®¹
+		content +=get_content(i)     #µÃµ½ËùÓĞÒ³ÃæÄÚÈİ
 	urls = get_urls(content)
 	os.system(r'mkdir "%s" ' %title)
-	print 'åˆ›å»º"%s"æ–‡ä»¶å¤¹æˆåŠŸ' %title
-	url_file = open(r'%s/urls' %title,'w')    #è¿½åŠ :w+
+	print '´´½¨"%s"ÎÄ¼ş¼Ğ³É¹¦' %title
+	url_file = open(r'%s/urls' %title,'w')    #×·¼Ó:w+
 	try:
 		url_file.write(urls)
-		print 'å›¾ç‰‡urlå†™å…¥æ–‡ä»¶æˆåŠŸ'
+		print 'Í¼Æ¬urlĞ´ÈëÎÄ¼ş³É¹¦'
 	finally:
 		url_file.close()
-	print '\n','='*10,'å¼€å§‹ä¸‹è½½','='*10,'\n'
+	print '\n','='*10,'¿ªÊ¼ÏÂÔØ','='*10,'\n'
 	os.system(r'wget -i "%s/urls" -P "%s" ' %(title,title) )
 
 
