@@ -2,10 +2,18 @@
 #coding: utf-8
 import os,sys,urllib2,re
 
+
+
+
+
+
+
+
+'''
 path  = 'test 路径'
 os.system('mkdir "%s"' %path)
 print '创建路径成功%s' %path
-'''
+
 # 抓取 标题
 home = r'http://my.hupu.com/jzgk/photo/a75782-1.html'
 homepage = urllib2.urlopen(home).read()

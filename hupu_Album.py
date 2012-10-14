@@ -12,7 +12,7 @@ todo:
 import os,sys,urllib2,re
 
 def get_pages(home,homepage):
-	match = re.match(r'http://my\.hupu\.com([\S]+)(?:\.html|-[\d]+\.html)',home) 
+	match = re.match(r'http://my\.hupu\.com([\S]+?)(?:-[\d]\.html|\.html)',home) 
 	if match == None:
 		print 'not fond!!'
 		exit()
@@ -68,7 +68,7 @@ def main():
 	finally:
 		url_file.close()
 	print '\n','='*10,'开始下载','='*10,'\n'
-	os.system(r'wget -i "%s/urls" -P "%s" ' %(title,title) )
+	#os.system(r'wget -i "%s/urls" -P "%s" ' %(title,title) )
 
 
 if __name__ == '__main__':
