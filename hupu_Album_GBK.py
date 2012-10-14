@@ -2,13 +2,7 @@
 #coding: GBK
 #author: xavierskip
 #date:10-13-2012
-'''
-issues:
-	抓取时每页的封面图没有去除，总共有几页图就会多出几张图
-	正则只匹配出jpg|gif|png|jpeg格式的图片，还有其他的格式么？
-todo:
-	去除重复的图片url
-'''
+
 import os,sys,urllib2,re
 
 def get_pages(home,homepage):
