@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #coding: GBK
 #author: xavierskip
-#date:10-13-2012
+#version:0.1
+#date: 10-13-2012
 
 import os,sys,urllib2,re
 
@@ -17,16 +18,14 @@ def get_pages(home,homepage):
 		page_list = [home]
 		return page_list
 	else:
-		P_max = int(P_nums[-1])    #有多少页
+		P_max = int(P_nums[-1])
 		#生成所有相册页面，还好都是有规律的。汗|||
 		page_list = [r'http://my.hupu.com%s-%d.html' %(path,i) for i in xrange(1,P_max+1)]
 		return page_list
 
 def get_content(url):
 	content = urllib2.urlopen(url).read()
-	print '%s  ---page done!' %url
 	return content
-
 
 def get_urls(content):
 	pat = r'http://i[\d]{1}\.hoopchina\.com\.cn/.+small\.(?:jpg|gif|png|jpeg)'
@@ -47,11 +46,16 @@ def main():
 		home = sys.argv[1]
 	homepage = urllib2.urlopen(home).read()    #字符编码真烦人
 	title    = re.search(r'<title>(.+)</title>',homepage).group(1)
-	print '正在抓取相册>>>『%s』' %title
+	print '正在抓取相册>>>%s>>>' %title
 	page_list = get_pages(home,homepage)    #得到相册的所有页面
+	P_num =  len(page_list)
+	print '此相册有%d页！' %P_num
 	content = ''
+	current = 0
 	for i in page_list:
+		current +=1
 		content +=get_content(i)     #得到所有页面内容
+		print '%d/%d:page done:%s' %(current,P_num,i)
 	urls = get_urls(content)
 	os.system(r'mkdir "%s" ' %title)
 	print '创建"%s"文件夹成功' %title
@@ -63,7 +67,6 @@ def main():
 		url_file.close()
 	print '\n','='*10,'开始下载','='*10,'\n'
 	os.system(r'wget -i "%s/urls" -P "%s" ' %(title,title) )
-
 
 if __name__ == '__main__':
     main()
