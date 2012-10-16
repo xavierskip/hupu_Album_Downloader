@@ -9,7 +9,7 @@
 把你要下载的某个虎扑相册的url作为脚本的参数运行即可。 
 (注意：是个人主页中单个相册url)  
 like this:  
-`>>> python hupu_Album.py  http://my.hupu.com/jzgk/photo/a75782-1.html `  （也可直接修改脚本内的url为要下载的相册url，直接运行）
+`>>> python hupu_Album.py  http://my.hupu.com/jzgk/photo/a75782-1.html `   （也可直接修改脚本内的url为要下载的相册url，直接运行）
 
 运行环境：
 ---
