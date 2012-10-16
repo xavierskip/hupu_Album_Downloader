@@ -66,7 +66,7 @@ def main():
 	finally:
 		url_file.close()
 	print '\n','='*10,'开始下载','='*10,'\n'
-	end = os.system(r'wget -i "%s/urls" -P "%s" ' %(title,title) )
+	end = os.system(r'wget -N -i "%s/urls" -P "%s" ' %(title,title) )
 	if end == 1:
 	    print '缺少wget！可以打开"%s"文件夹下的urls文件，复制其内容用其他下载工具下载，例如迅雷等~' %title
 	else:
