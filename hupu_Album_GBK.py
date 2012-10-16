@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding: GBK
 #author: xavierskip
-#version:0.1
+#version: 0.13
 #date: 10-13-2012
 
 import os,sys,urllib2,re
