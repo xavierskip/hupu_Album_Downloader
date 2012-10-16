@@ -14,7 +14,7 @@ like this:
 运行环境：
 ---
 需要 python环境 。(linux 发行版都会带吧，mac下没有测试过)  
-下载模块需要 wget   
+下载模块需要 wget  
 （也可以打开urls文件，复制粘贴内容，用迅雷或者其他下载软件下载）  
 
 version:0.1
