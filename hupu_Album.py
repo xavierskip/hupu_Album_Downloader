@@ -2,7 +2,7 @@
 #coding: utf-8
 #author: xavierskip
 #version: 0.13
-#date: 10-13-2012
+#date: 10-18-2012
 
 import os,sys,urllib2,re
 
@@ -28,10 +28,17 @@ def get_content(url):
 	return content
 
 def get_urls(content):
-	pat = r'http://i[\d]{1}\.hoopchina\.com\.cn/.+small\.(?:jpg|gif|png|jpeg)'
+	pat = r'http://i[\d]{1}\.hoopchina\.com\.cn/.+small\.(?:jpg|gif|png|jpeg|bmp)'
 	url_list = re.findall(pat,content)    #parse img url
-	print '得到%d张图片URL' %len(url_list)
-	urls = '\n'.join(url_list)
+	#remove cover img url
+	no_cover = []
+	for i in url_list:
+	    if i in no_cover:
+	    	pass
+	    else:
+	        no_cover.append(i)
+	print '此相册有%s张图片' %len(no_cover)
+	urls = '\n'.join(no_cover)
 	urls = re.sub(r'small\.',r'big.',urls)
 	return urls
 
