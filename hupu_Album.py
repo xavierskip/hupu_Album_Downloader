@@ -45,13 +45,14 @@ def dowm_img(urls):
 def main():
 	#脚本可带url参数
 	if len(sys.argv)<=1:
-		home = r'http://my.hupu.com/jackson817/photo/a82914-1.html'    #脚本内置虎扑相册地址
+		print '请输入需要下载的相册地址。'
+		home = r'http://my.hupu.com/jackson817/photo/a82914-1.html'    #福利
 	else:
 		home = sys.argv[1]
 	# 判断url是否正确
 	match = re.match(r'http://my\.hupu\.com(/[\S]+?/photo/a[\d]+?)(?:\-[\d]+\.html|\.html)',home) 
 	if match == None:
-		print 'some thing wrong!\n说好了不要拿乱七八糟的url来调戏我的！'
+		print '此URL不能识别\n请输入单个相册的页面地址！'
 		exit()
 	path = match.group(1)    #Album path
 	print '\n','='*10,'开始抓取','='*10,'\n'
@@ -78,7 +79,7 @@ def main():
 	if end == 1:
 	    print '缺少wget！可以打开"%s"文件夹下的urls文件，复制其内容用其他下载工具下载~' %title
 	else:
-	    print 'well done!'
+	    print '搞定!'
 		
 if __name__ == '__main__':
     main()
