@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 #coding: utf-8
-#author: xavierskip
-#version: 0.15
-#date: 10-18-2012
-
+#version: 0.2
 import os,sys,urllib2,re
 
 def get_pages(home,path):
-	homepage = get_content(home).decode('gb2312').encode('utf-8')    #字符编码真烦人
+	homepage = get_content(home)
 	title    = re.search(r'<title>(.+)</title>',homepage).group(1)
 	print '正在抓取相册>>>%s>>>' %title
 	pat  = path+ r'-([\d]+).html(?:\'|\")>'       #匹配剩下的相册页面
@@ -24,23 +21,27 @@ def get_pages(home,path):
 def get_urls(content):
 	pat = r'http://i[\d]{1}\.hoopchina\.com\.cn/.+small\.(?:jpg|gif|png|jpeg|bmp)'
 	url_list = re.findall(pat,content)    #parse img url
-	#remove cover img url
-	no_cover = []
+	# sub smell to big pic and remove repeat img url
+	# list(set(url_list))
+	urls = []
 	for i in url_list:
-	    if i in no_cover:
-	        pass
-	    else:
-	        no_cover.append(i)
-	print '此相册有%s张图片' %len(no_cover)
-	urls = '\n'.join(no_cover)
-	urls = re.sub(r'small\.',r'big.',urls)
-	return urls
+		if not i in urls:
+			urls.append(i)
+	return re.sub(r'small.', r'big.', '\n'.join(urls)),len(urls)
 
 def get_content(url):
 	return urllib2.urlopen(url).read()
 
-def dowm_img(urls):
-	pass
+def dowm_img(urls,path,pic_num):
+	num = 0
+	for url in urls.split('\n'):
+		filename = url.split('/')[-1]
+		print '[%s/%s]download>>>%s' %(num,pic_num,filename)
+		data = get_content(url)
+		f= open('%s/%s' %(path,filename),'wb')
+		f.write(data)
+		f.close()
+		num+=1
 
 def main():
 	#脚本可带url参数
@@ -56,30 +57,29 @@ def main():
 		exit()
 	path = match.group(1)    #Album path
 	print '\n','='*10,'开始抓取','='*10,'\n'
-	page_list,title = get_pages(home,path)    #得到相册的所有页面
+	#得到相册的所有页面地址
+	page_list,title = get_pages(home,path)
 	P_num =  len(page_list)
 	print '此相册有%d页！' %P_num
 	content = ''
 	current = 0
 	for i in page_list:
 		current +=1
-		content +=get_content(i)     #得到所有页面内容
+		content +=get_content(i)
 		print '%d/%d:page done:%s' %(current,P_num,i)
-	urls = get_urls(content)
+	#从所有的页面内容中抓取图片url
+	urls,pic_num = get_urls(content)
 	os.system(r'mkdir "%s" ' %title)
-	print '创建"%s"文件夹成功' %title
-	url_file = open(r'%s/urls' %title,'w')    #追加:w+
-	try:
-		url_file.write(urls)
+	print '%s张图片需要下载\n创建"%s"文件夹>>>' %(pic_num, title)
+	with open(r'%s/urls' %title,'w') as urls_file:
+		urls_file.write(urls)
 		print '图片url写入文件成功'
-	finally:
-		url_file.close()
 	print '\n','='*10,'开始下载','='*10,'\n'
-	end = os.system(r'wget -N -i "%s/urls" -P "%s" ' %(title,title) )
+	end = os.system(r'wget -N -i "%s/urls" -P "%s" ' %(title,title) ) # if you have wget
 	if end == 1:
-	    print '缺少wget！可以打开"%s"文件夹下的urls文件，复制其内容用其他下载工具下载~' %title
+	    dowm_img(urls,title,pic_num)
 	else:
-	    print '搞定!'
+	    print 'wget搞定!'
 		
 if __name__ == '__main__':
     main()

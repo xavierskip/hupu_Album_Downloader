@@ -18,6 +18,10 @@ like this:
 （也可以打开urls文件，复制粘贴内容，用迅雷或者其他下载软件下载）  
 
 
+version:0.2
+---
+* 没有wget，脚本自行下载
+
 version:0.15
 ---
 * 判断url是否符合相册抓取要求
@@ -38,7 +42,7 @@ issues:
 
 todo:
 ---
-* done:去除重复的图片url
-* done:对要抓取的url进行判断，是否可以抓取的页面地址。
-* 下载功能的python实现
+* <del>去除重复的图片</del>
+* <del>对要抓取的url进行判断，是否可以抓取的页面地址。</del>
+* <del>下载功能的python实现</del>
 * gui或者更多～
