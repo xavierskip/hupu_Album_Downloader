@@ -4,7 +4,7 @@
 import os,sys,urllib2,re
 
 def get_pages(home,path):
-	homepage = get_content(home)
+	homepage = get_content(home).decode('gbk').encode('utf-8') #字符编码呀！
 	title    = re.search(r'<title>(.+)</title>',homepage).group(1)
 	print '正在抓取相册>>>%s>>>' %title
 	pat  = path+ r'-([\d]+).html(?:\'|\")>'       #匹配剩下的相册页面
