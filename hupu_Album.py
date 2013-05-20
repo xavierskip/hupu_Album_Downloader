@@ -78,8 +78,6 @@ def main():
 	end = os.system(r'wget -N -i "%s/urls" -P "%s" ' %(title,title) ) # if you have wget
 	if end == 1:
 	    dowm_img(urls,title,pic_num)
-	else:
-	    print 'wget搞定!'
 		
 if __name__ == '__main__':
     main()
