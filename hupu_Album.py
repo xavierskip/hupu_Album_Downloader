@@ -47,7 +47,7 @@ def main():
 	#脚本可带url参数
 	if len(sys.argv)<=1:
 		print '请输入需要下载的相册地址。'
-		home = r'http://my.hupu.com/jackson817/photo/a82914-1.html'    #福利
+		home = r'http://my.hupu.com/sunyatsen/photo/a135716.html'    #福利
 	else:
 		home = sys.argv[1]
 	# 判断url是否正确
