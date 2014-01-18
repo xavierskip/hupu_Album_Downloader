@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>虎扑相册图片抓取器</title>
+    <meta name="keywords" content="hupu,hoopchina,albums,picture,spider,crawl,虎扑,相册,抓图">
+    <meta name="description" content="download hoopchina.com users's albums pictures">
+    <meta name="author" content="Xavier skip">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="/static/main.js"></script>
+</head>
+<body>
+    <div id="body">
+        <div id="wrap">
+            <header>相册图片抓取器</header>
+            <div id="console">
+                <label>相册URL:<input type="text" id="input"></label>
+                <button id="crawl" class="btn">抓取</button>
+                <div id="load">
+                    <p class="loading spin"></p>
+                    <p>正在抓取，请稍等～～</p>
+                </div>
+                    <p>like this:<a class="a" class="a" href="http://my.hupu.com/sunyatsen/photo/a135716.html" target="blank">http://my.hupu.com/sunyatsen/photo/a135716.html</a></p>
+            </div>
+            <div id="data" class="left">
+                <form>
+                    <p>
+                        <input type=button value="全选" onClick="javascript:this.form.text.focus();this.form.text.select();"><span>Ctrl + c 复制下来,用下载工具下载</span>
+                    </p>
+                    <textarea id="output" class="urltext" name="text" rows="23" cols="65" readonly="readonly"></textarea>
+                </form>
+            </div>
+            <div id="albuminfo" class="right">
+                <p>相册信息:</p>
+                <article>
+                    <img src="" id="albumcover">
+                    <p id="albumtitle"></p>
+                    <p id="albumpics"></p>
+                </article>
+            </div>
+        </div>
+        <div id="links">
+            <p>
+                <a href="{{ url_for('albums') }}">Gallery</a>
+            </p>
+            
+        </div>
+    </div>
+    <footer>
+        powered by <a  class="a" href="http://developer.baidu.com/bae">bae</a> & <a class="a" href="http://flask.pocoo.org/">flask</a> | last update 2014-01-18  | <a class="a" href="mailto:xavierskip@gmail.com?Subject=BUG:" target="_blank">反馈</a>
+    </footer>
+</body>
+</html>

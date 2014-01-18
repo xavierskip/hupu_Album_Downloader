@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>查询历史</title>
+    <meta name="keywords" content="hupu,hoopchina,albums,picture,spider,crawl,虎扑,相册,抓图">
+    <meta name="description" content="download hoopchina.com users's albums pictures">
+    <meta name="author" content="Xavier skip">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <style type="text/css">
+        p, ul, ol, li{ margin: 0;padding: 0;}
+        a { text-decoration: none;color: #464646;cursor: pointer;}
+        ul {list-style: none;}
+
+        .title {font-weight: bold;}
+        .album_list a:hover{color: #fff;background-color: #7ad;}
+        .album_list img { border: #e2e2e2 2px solid;padding: 1px;}
+
+        .album_list li{
+            display: inline-block;
+            padding: 5px 5px 0 5px;
+            line-height: 18px;
+            height: 281px!important;
+            height: 291px;
+            overflow: hidden;
+        }
+        body{
+            font-size: 13px;
+            color: #545454;
+        }
+    </style>
+</head>
+<body>
+    <h1>查询历史</h1>
+    <ul class="album_list">
+        {% for album in albums %}
+            <li>
+                <a href="{{ album.homepage }}"><img src="/covers/{{album.cover}}"></a>
+                <p class="title">
+                <a href="{{ album.homepage }}">{{ album.title }}</a><span>(共{{ album.hasPics }}张)</span>
+                </p>
+                <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
+                
+            </li>
+        {% else %}
+            <em>怎么会没有呢？</em>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
