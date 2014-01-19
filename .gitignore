@@ -1,0 +1,3 @@
+*.pyc
+/web/DATA/albums.db
+/web/static/covers/*
