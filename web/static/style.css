@@ -1,7 +1,7 @@
 /*------------------------------------
 @author xavierskip@gmial.com
 @link http://xavierskip.com
-@update 2013-06-01
+@update 2014-01-19
         __                      
       /\ \  __    __            
   ____\ \ \/  \ /\_\    _____   
@@ -50,7 +50,7 @@ textarea:focus {
     border-left: 1px dashed #ccc;
     border-right: 1px dashed #ccc;
     border-bottom: 1px dashed #ccc;
-    box-shadow: 0 0 7px #ccc;
+    box-shadow: 1px 2px 7px #505050;
     background: #fff;
     margin-right: auto;
     margin-left: auto;
@@ -98,22 +98,26 @@ textarea:focus {
 }
 #links{
     position: relative;
-    top:-32px;
+    top: -39px;
     left: 1px;
     float: right;
-    height: 33px;
-    width: 70px;
+    height: 40px;
+    width: 80px;
     box-shadow: inset 3px 2px 4px #8B8B8B;
     background-color: #F1F1F1;
-    border-radius:7px/5px 1px 1px 1px ;
+    border-top: 1px dashed #ccc;
+    border-left: 1px dashed #ccc;
 }
 #links p{
-    margin: 9px;
+    margin: 13px 0;
 }
 #links a{
-    color: #000;
-    border-bottom:0;
-    height: 33px;
+    padding: 13px;
+    height: 40px;
+    font-weight: bold;
+    color: #E74C3C;
+    text-shadow: 1px 1px 2px #4E4E4E;
+
 }
 #links a:hover{
     background-color:;

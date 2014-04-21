@@ -5,19 +5,18 @@ $(document).ready(function(){
 var output = document.getElementById('output')
 
 var stats = {
-    1:'',
-    2:'此URL不能识别\n请输入单个相册的页面地址！',
-    3:'请确认，在没有登陆的情况下依旧可以访问此相册吗？'
+    2: '此URL不能识别\n请输入单个相册的页面地址！',
+    302: '请确认，在没有登陆的情况下依旧可以访问此相册吗？'
 }
 
 function draw(response){
-    if(response.stats==1){
-        output.value = response.imgUrls;
+    if(response.stat==200){
+        output.value = response.pics_urls;
         $('#albumcover').attr('src',response.imgBase64);
-        $('#albumtitle').html(response.title+'有'+response.hasPics+'张图片');
-        $('#albumpics').html('抓取出'+response.getPics+'张图片');
+        $('#albumtitle').html(response.title+'有'+response.pics+'张图片');
+        $('#albumpics').html('抓取出'+response.get_pics+'张图片');
     }else{
-        output.value = stats[response.stats];
+        output.value = stats[response.stat];
     }    
 }
 
