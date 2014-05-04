@@ -16,7 +16,6 @@ def detect_album_path(album_url):
 
 
 class HupuAlbum(object):
-    # global
     g = ''
     session = requests.session()
     def __init__(self, url):
@@ -100,6 +99,8 @@ class HupuAlbum(object):
         img_list = re.findall('<span>.+?<img src="(.+?)"',self.g)
         self.get_pics = len(img_list)
         self.pics_urls = re.sub('small.', 'big.', '\n'.join(img_list))
+        # clear g ! important !!! 
+        HupuAlbum.g = ''
         return self.pics_urls
 
     def save(self):
@@ -114,6 +115,5 @@ class HupuAlbum(object):
             super(HupuAlbum.GetUrlThread, self).__init__()
      
         def run(self):
-            print('down: %s' %self.url)
             response = HupuAlbum.session.get(self.url)
             HupuAlbum.g += response.content # global g
