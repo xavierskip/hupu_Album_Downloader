@@ -33,6 +33,7 @@ class HupuAlbum(object):
         match = re.match('http://my\.hupu\.com(/[\S]+?/photo/a[\d]+?)(?:\-[\d]+\.html|\.html)',self.url)
         if match:
             self.path = match.group(1)
+            self.homepage = 'http://my.hupu.com%s.html' %self.path
         # empty:0 init:1  access:200 deny：302
         self.state = 1
 
@@ -53,7 +54,7 @@ class HupuAlbum(object):
             return self
 
     def get_info(self):
-    	r = self.session.get(self.path) # album home page
+    	r = self.session.get(self.homepage) # album home page
         # can visit the album
         if len(r.history) > 0 and r.history[0].status_code == 302:
             self.state = 302
