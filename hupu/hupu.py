@@ -34,7 +34,7 @@ class HupuAlbum(object):
         if match:
             self.path = match.group(1)
         # empty:0 init:1  access:200 deny：302
-        self.stat = 1
+        self.state = 1
 
     def login(self,username,password):
     	login = "http://passport.hupu.com/login"
@@ -53,10 +53,10 @@ class HupuAlbum(object):
             return self
 
     def get_info(self):
-    	r = self.session.get(self.url)
+    	r = self.session.get(self.path) # album home page
         # can visit the album
         if len(r.history) > 0 and r.history[0].status_code == 302:
-            self.stat = 302
+            self.state = 302
             return self
         # charset
         if r.encoding == 'gb2312':
@@ -81,9 +81,9 @@ class HupuAlbum(object):
         self.page_urls = ['http://my.hupu.com%s-%d.html' %(self.path,i) for i in range(1,self.pages+1)]
         # album empty
         if self.pics == 0:
-            self.stat = 0
+            self.state = 0
             return self
-        self.stat = 200
+        self.state = 200
         return self
 
     def down(self):
@@ -94,7 +94,7 @@ class HupuAlbum(object):
             threads.append(t)
             t.start()
         for t in threads:
-            t.join()
+            t.join(timeout=60)
         # filter img
         img_list = re.findall('<span>.+?<img src="(.+?)"',self.g)
         self.get_pics = len(img_list)
