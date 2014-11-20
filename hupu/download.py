@@ -34,10 +34,10 @@ def get(url,**argv):
         # get album info
         info = album.get_info()
         album.title = album.title.encode('utf-8') # str encode
-        if info.stat == 302:
+        if info.state == 302:
             print "请确认，在没有登陆的情况下依旧可以访问此相册吗？"
             return 0
-        elif info.stat == 0:
+        elif info.state == 0:
             print "抓不到图片"
             return 0
         else:            
@@ -52,29 +52,15 @@ def get(url,**argv):
 
 def main():
     weal = 'http://my.hupu.com/sunyatsen/photo/a135716.html'
-    useage = '\nuseage: python download.py album_url [[username] [password]]\n'
-    # get album img
-    if len(sys.argv)==1:
-        print useage
-        tips = '是否下载默认相册[%s]?[ y/n ]:' %weal
-        r = raw_input(tips)
-        if r=='' or r=='y':
-            album = get(weal)            
-        else:
-            print 'Termination'
-            return 0
-    elif len(sys.argv) == 2:
+    useage = 'Usage: python download.py <url> <username> <password>'
+    try:
         url = sys.argv[1]
-        album = get(url)
-    else:
-        try:
-            url = sys.argv[1]
-            username = sys.argv[2]
-            password = sys.argv[3]
-        except Exception, e:
-            print useage
-            return 0
-        album = get(url,username=username,password=password)
+        username = sys.argv[2]
+        password = sys.argv[3]
+    except Exception, e:
+        print useage
+        return 0
+    album = get(url,username=username,password=password)
     # down album img
     if album:
         try:
