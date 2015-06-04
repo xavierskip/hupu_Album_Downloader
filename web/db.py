@@ -19,13 +19,13 @@ class Database:
     def close(self):
         self.conn.close()
 
-def init_db():
-    from config import *
+def init_db(host, port, user, passwd, charset="utf8"):
     conn = pymysql.connect(
-        host = HOST,
-        port = PORT,
-        user = DBUSER,
-        passwd = DBPASSWD
+        host = host,
+        port = port,
+        user = user,
+        passwd = passwd,
+        charset = charset
     )
     try:
         with conn.cursor() as cursor:
@@ -38,4 +38,5 @@ def init_db():
 
 
 if __name__ == '__main__':
-    init_db()
+    from config import *
+    init_db(HOST, PORT, DBUSER, DBPASSWD)
