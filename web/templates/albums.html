@@ -6,24 +6,26 @@
     <meta name="keywords" content="hupu,hoopchina,albums,picture,spider,crawl,虎扑,相册,抓图">
     <meta name="description" content="download hoopchina.com users's albums pictures">
     <meta name="author" content="Xavier skip">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
     <style type="text/css">
         p, ul, ol, li{ margin: 0;padding: 0;}
-        a { text-decoration: none;color: #464646;cursor: pointer;}
+        a { text-decoration: none;color: #464646;cursor: pointer;padding: 2px}
+        a:hover{ text-decoration: none;}
         ul {list-style: none;}
 
-        .title {font-weight: bold;}
-        .album_list a:hover{color: #fff;background-color: #7ad;}
-        .album_list img { border: #e2e2e2 2px solid;padding: 1px;}
-
+        .title {padding: 2px;}
+        .album_list img { box-shadow: 2px 2px 5px #ccc; padding: 2px;}
+        .album_list img:hover{color: #fff;background-color: #7ad;}
         .album_list li{
             display: inline-block;
             padding: 5px 5px 0 5px;
             line-height: 18px;
             height: 281px!important;
             height: 291px;
+            width: 144px;
             overflow: hidden;
-            max-width: 150px;
         }
         body{
             font-size: 13px;
@@ -32,21 +34,43 @@
     </style>
 </head>
 <body>
-    <h1>查询历史</h1>
-    <ul class="album_list">
-        {% for album in albums %}
-            <li>
-                <a href="{{ album.homepage }}"><img src="/covers/{{album.cover}}"></a>
-                <p class="title">
-                <a href="{{ album.homepage }}">{{ album.title }}</a><span>(共{{ album.hasPics }}张)</span>
-                </p>
-                <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
-                
-            </li>
-        {% else %}
-            <em>怎么会没有呢？</em>
-        {% endfor %}
-    </ul>
-
+    <div class="container">
+        <div class="page-header">
+            <h1>抓取历史 <small><a href="{{url_for('index')}}"> 回首页</a></small></h1>
+        </div>
+        <ul class="album_list">
+            {% for album in albums %}
+                <li>
+                    <a href="{{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
+                    <p class="title">
+                    <a href="{{url_for('album')}}?url={{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
+                    </p>
+                    <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
+                    
+                </li>
+            {% else %}
+                <em>怎么会没有呢？</em>
+            {% endfor %}
+        </ul>
+        <footer>
+            <ul class="pagination">
+                {% for n in range(1,pages.number+1) %}
+                    {% if n == pages.current%}
+                        <li class="active" ><a href="{{url_for('albums')}}?page={{n}}">{{n}}<span class="sr-only">(current)</span></a></li>
+                    {% else %}
+                        <li><a href="{{url_for('albums')}}?page={{n}}">{{n}}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </footer>
+    </div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-56936423-1', 'auto');
+  ga('send', 'pageview');
+</script>
 </body>
 </html>
