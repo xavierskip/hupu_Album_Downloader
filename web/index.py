@@ -166,7 +166,7 @@ def albums():
     p = int(g.cur.fetchone().get('count(*)'))
     pn = int(ceil(p/pimg))
     g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(s,e))
-    albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('getPics')) \
+    albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
                 for row in g.cur.fetchall() ]
     pages = dict(current=page,number=pn)
     return render_template('albums.html',albums=albums,pages=pages)
