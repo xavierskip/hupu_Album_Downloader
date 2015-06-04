@@ -9,7 +9,7 @@ CREATE TABLE `albums` (
   `cover` text NOT NULL,
   `pics` int(11) NOT NULL,
   `getPics` int(11) NOT NULL,
-  `picsUrls` text NOT NULL,
+  `picsUrls` mediumtext NOT NULL,
   `times` int(11) NOT NULL DEFAULT '1',
   `logTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
