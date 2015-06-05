@@ -4,9 +4,9 @@ USE hupu;
 
 CREATE TABLE `albums` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `url` varchar(128) NOT NULL DEFAULT '',
-  `title` varchar(32) NOT NULL DEFAULT '',
-  `cover` text NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `cover` mediumtext NOT NULL,
   `pics` int(11) NOT NULL,
   `getPics` int(11) NOT NULL,
   `picsUrls` mediumtext NOT NULL,
@@ -17,21 +17,20 @@ CREATE TABLE `albums` (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `users` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` int(11) NOT NULL,
-  `name` varchar(11) NOT NULL DEFAULT '',
-  `avatar` varchar(128) NOT NULL DEFAULT '',
-  `access_token` varchar(11) NOT NULL DEFAULT '',
+  `uid` bigint(20) unsigned NOT NULL,
+  `access_token` varchar(255) NOT NULL,
+  `avatar` varchar(255) NOT NULL,
+  `name` varchar(32) NOT NULL DEFAULT '',
   `province` int(11) NOT NULL,
   `city` int(11) NOT NULL,
-  `location` varchar(11) NOT NULL DEFAULT '',
-  `description` varchar(128) NOT NULL DEFAULT '',
-  `blog` varchar(128) NOT NULL DEFAULT '',
-  `gender` char(11) NOT NULL DEFAULT '',
+  `location` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `blog` varchar(255) NOT NULL,
+  `gender` varchar(1) NOT NULL DEFAULT '',
   `followers` int(11) NOT NULL,
   `friends` int(11) NOT NULL,
   `statuses` int(11) NOT NULL,
-  `created` varchar(32) NOT NULL DEFAULT '',
-  `avatar_hd` varchar(128) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+  `created` varchar(255) NOT NULL,
+  `avatar_hd` varchar(255) NOT NULL,
+  PRIMARY KEY (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
