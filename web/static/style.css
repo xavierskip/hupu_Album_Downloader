@@ -114,15 +114,17 @@ textarea:focus {
     padding: 5px;
 }
 #link1 {
-    position: absolute;
+    position: relative;
+    float: right;
     right: -1px;
-    bottom: -1px;
+    top: -40px;
     background-color: #F7F7F7;
 }
 #link2 {
-    position: absolute;
-    right: 89px;
-    bottom: -1px;
+    position: relative;
+    float: right;
+    right: -1px;
+    top: -40px;
     border-left: 1px dashed #ccc;
     background-color: #FDFDFD;
 
@@ -136,7 +138,7 @@ textarea:focus {
 }
 .links{
     height: 40px;
-    box-shadow: inset 3px 2px 4px #8B8B8B;
+    box-shadow: inset 3px 2px 3px #8B8B8B;
     border-top: 1px dashed #ccc;
     display: inline-block;
 }

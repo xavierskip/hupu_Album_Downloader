@@ -156,20 +156,37 @@ def logout():
 
 @app.route('/albums')
 def albums():
-    pimg = 100.0# how much img in one page , float num
+    imgs = 100.0# how much img in one page , float num
     try:
-        page = abs(int(request.args.get('page')))
+        currentpage = abs(int(request.args.get('page')))
     except Exception, e:
-        page = 1
-    s,e = ( int((page-1)*pimg),int(pimg))
+        currentpage = 1
+    imgstart,imgend = ( int((currentpage-1)*imgs),int(imgs))
     g.cur.execute('''SELECT count(*) from `albums`''')
-    p = int(g.cur.fetchone().get('count(*)'))
-    pn = int(ceil(p/pimg))
-    g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(s,e))
+    imgcount = int(g.cur.fetchone().get('count(*)'))
+    pagenums = int(ceil(imgcount/imgs))
+    # get albums info
+    g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(imgstart,imgend))
     albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
                 for row in g.cur.fetchall() ]
-    pages = dict(current=page,number=pn)
-    return render_template('albums.html',albums=albums,pages=pages)
+    # pages = dict(current=page,number=pn)
+    step = 2
+    rangeStart, rangeEnd = currentpage-step,currentpage+step
+    if rangeStart < 1 and rangeEnd > pagenums:
+        pages = [ i for i in range(1,pagenums+1)]
+    elif rangeStart <= 1+1:
+        pages = [ i for i in range(1,rangeEnd+1)]
+        pages.extend(['',pagenums])
+    elif rangeEnd >= pagenums-1:
+        pages = [1,'']
+        pages.extend([ i for i in range(rangeStart,pagenums+1)])
+    else:
+        pages = [1,'']
+        pages.extend([i for i in range(rangeStart,rangeEnd+1)])
+        pages.extend(['',pagenums])
+
+
+    return render_template('albums.html',albums=albums,pages=pages,currentpage=currentpage)
     # return "<h1>UNDER CONSTRUCTION!</h1>"
 
 @app.route('/album')

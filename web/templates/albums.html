@@ -10,6 +10,10 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
     <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
     <style type="text/css">
+        body{
+            font-size: 13px;
+            color: #545454;
+        }
         p, ul, ol, li{ margin: 0;padding: 0;}
         a { text-decoration: none;color: #464646;cursor: pointer;padding: 2px}
         a:hover{ text-decoration: none;}
@@ -27,9 +31,27 @@
             width: 144px;
             overflow: hidden;
         }
-        body{
-            font-size: 13px;
-            color: #545454;
+        .pagination a{
+            padding: 2px 7px;
+            border: #CCCCCC 1px solid;
+            margin: 0 3px;
+            font-family: Tahoma;
+            color: #444;
+        }
+        .pagination .active a,
+        .pagination .active a:hover{
+            background: #95071B;
+            border-color: #95071B;
+        }
+        .pagination a:hover{
+            background: #95071B;
+            border-color: #95071B;  
+        }
+        .pagination .disabled span{
+            border: 0;
+        }
+        .pagination .disabled span:hover{
+            cursor: default;
         }
     </style>
 </head>
@@ -54,11 +76,13 @@
         </ul>
         <footer>
             <ul class="pagination">
-                {% for n in range(1,pages.number+1) %}
-                    {% if n == pages.current%}
-                        <li class="active" ><a href="{{url_for('albums')}}?page={{n}}">{{n}}<span class="sr-only">(current)</span></a></li>
+                {% for p in pages %}
+                    {% if not p %}
+                        <li class="disabled"><span aria-hidden="true">...</span></a></li>
+                    {% elif p == currentpage%}
+                        <li class="active" ><a href="{{url_for('albums')}}?page={{p}}">{{p}}<span class="sr-only">(current)</span></a></li>
                     {% else %}
-                        <li><a href="{{url_for('albums')}}?page={{n}}">{{n}}</a></li>
+                        <li><a href="{{url_for('albums')}}?page={{p}}">{{p}}</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
