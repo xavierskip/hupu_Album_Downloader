@@ -193,10 +193,17 @@ def albums():
 def album():
     url = request.args.get('url')
     if url:
-        g.cur.execute(''' SELECT `picsUrls` FROM `albums` WHERE `url` = %s''',(url,))
+        g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''',(url,))
         r = g.cur.fetchone()
         if r:
-            return Response(r.get('picsUrls'),mimetype='text/pain')
+            # return Response(r.get('picsUrls'),mimetype='text/pain')
+            title = r.get('title').encode('utf-8')
+            # print title.decode('utf-8'),type(title)
+            return Response(r.get('picsUrls'),
+                headers = {
+                    'Content-Type': 'text/pain',
+                    'Content-Disposition': 'attachment; filename="%s.txt"' %title
+                })
         else:
             return 'don\'t found!'
     else:
