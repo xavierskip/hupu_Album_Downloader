@@ -65,7 +65,7 @@ textarea:focus {
     color: #646464;
 }
 #wrap{
-    padding: 30px 20px;
+    padding: 20px 20px 0 20px;
 }
 #console {
     font-size: 17px;
@@ -117,14 +117,14 @@ textarea:focus {
     position: relative;
     float: right;
     right: -1px;
-    top: -40px;
+    top: 1px;
     background-color: #F7F7F7;
 }
 #link2 {
     position: relative;
     float: right;
     right: -1px;
-    top: -40px;
+    top: 1px;
     border-left: 1px dashed #ccc;
     background-color: #FDFDFD;
 
@@ -143,11 +143,11 @@ textarea:focus {
     display: inline-block;
 }
 .links p{
-    margin: 13px 0;
+    margin: 8px 0;
     display: inline-block;
 }
 .links a{
-    padding: 13px;
+    padding: 11px;
     height: 40px;
     font-weight: bold;
     color: #E74C3C;
@@ -250,3 +250,5 @@ textarea:focus {
 .avatar:hover img {
 border-color: #7CA2E5;
 }
+/*clear float*/
+html body div.clear, html body span.clear { background: none; border: 0; clear: both; display: block; float: none; font-size: 0; margin: 0; padding: 0; overflow: hidden; visibility: hidden; width: 0; height: 0; }  
