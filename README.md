@@ -3,22 +3,26 @@
 
 虎扑相册现在需要登录才能浏览，所以下载工具需要指定能够登录的虎扑帐号。
 
-`hupu\download.py` 是直接运行的脚本。
+`download.py` 是直接运行的脚本。
 
 uasge：`python download.py  <你想要下载的虎扑相册的url> <用户名> <密码>`
+
+(注意此模块`hupu`会在自己的目录下记录登录帐号的cookies)
 
 `runserver.py` 文件是运行 web服务用来在网络上搭建此工具。
 
 依赖 Flask网络框架，数据存储需要mysql。
 
 ``` requirements.txt
+# 抓取部分
+requests==2.2.1 
+# 网络服务部分
 Flask==0.10.1
-requests==2.2.1
 PyMySQL==0.6.6
 ```
 
-1. 先运行 `web/db.py` 初始化数据库   
-2. 直接运行 `runserver.py` 开启web服务
+1. 先运行 `python web/db.py` 初始化数据库   
+2. 直接运行 `python runserver.py` 开启web服务
 
 [web服务配置]
 
