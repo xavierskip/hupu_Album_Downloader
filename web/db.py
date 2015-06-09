@@ -27,9 +27,11 @@ def init_db(host, port, user, passwd, charset="utf8"):
         passwd = passwd,
         charset = charset
     )
+    import os
+    schema = os.path.join(os.path.dirname(os.path.abspath(__file__)),'schema.sql')
     try:
         with conn.cursor() as cursor:
-            with open("web/schema.sql") as sql:
+            with open(schema,'r') as sql:
                 for line in sql.read().split(';\n'):
                     cursor.execute(line)
         conn.commit()
