@@ -6,14 +6,15 @@ var output = document.getElementById('output')
 
 var states = {
     0: '空相册,什么都没有找到？',
-    2: '此URL不能识别\n请输入单个相册的页面地址!\nurl like this:http://my.hupu.com/sunyatsen/photo/a135716.html',
+    2: '暂不支持抓取加密相册',
     3: 'login fail',
     4: 'user id non-existent',
-    302: '请确认，在没有登陆的情况下依旧可以访问此相册吗？\n请使用高级功能（登陆抓取）'
+    5: '此URL不能识别\n请输入单个相册的页面地址!\nurl like this:http://my.hupu.com/sunyatsen/photo/a135716.html',
+    302: '请确认，此相册是只对好友公开吗？\n请使用高级功能，指定用户抓取）'
 }
 
 function draw(response){
-    if(response.state==200){
+    if(response.state<=1){
         output.value = response.pics_urls;
         $('#albumcover').attr('src',response.cover);
         $('#albumtitle').html(response.title+'有'+response.pics+'张图片');

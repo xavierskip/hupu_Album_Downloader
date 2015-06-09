@@ -6,9 +6,11 @@ import re
 import urllib2
 from hupu import HupuAlbum
 from hupu import detect_album_path
-# http://my.hupu.com/hoopchinalv/photo/a1787001.html
-# http://my.hupu.com/BelieveMyself/photo/a139390-1.html
-# http://my.hupu.com/sunyatsen/photo/a135716.html
+# 普通        http://my.hupu.com/hoopchinalv/photo/a1787001.html
+# 只对好友公开 http://my.hupu.com/BelieveMyself/photo/a139390-1.html
+# 由来        http://my.hupu.com/sunyatsen/photo/a135716.html
+# 空白测试     http://my.hupu.com/137262/photo/a0-1.html
+# import ipdb
 
 def save_imgs(urls,path,n):
     c=1
@@ -20,26 +22,30 @@ def save_imgs(urls,path,n):
             f.write(img)
         c+=1
 
-def get(url,**argv):
+def get(url, username, password):
     url = detect_album_path(url)
     if url:
         album = HupuAlbum(url)
         # login
-        if argv:
-            if album.login(argv['username'],argv['password']):
-                print "登录成功"
-            else:
-                print "登陆失败，请检查用户名和密码"
-                return 0
+        info = album.login(argv['username'],argv['password'])
+        if type(info) == unicode:
+            print "登录成功"
+        elif type(info) == int:
+            if info == 302:
+                print "请确认登录用户可以访问此相册吗？"
+                return None
+            if info == 2:
+                print "暂不支持加密相册"
+                return None
+        else:
+            print "登陆失败，请检查用户名和密码"
+            return None
         # get album info
         info = album.get_info()
         album.title = album.title.encode('utf-8') # str encode
-        if info.state == 302:
-            print "请确认，在没有登陆的情况下依旧可以访问此相册吗？"
-            return 0
-        elif info.state == 0:
-            print "抓不到图片"
-            return 0
+        if info.state == 0:
+            print "空相册抓不到图片"
+            return None
         else:            
             print '《%s》此相册有%d张、%d页' %(album.title,album.pics,album.pages)
             album.down()
@@ -47,20 +53,19 @@ def get(url,**argv):
             return album
     else:
         print '此URL不能识别\n请输入单个相册的页面地址！'
-        return 0
+        return None
 
 
 def main():
-    weal = 'http://my.hupu.com/sunyatsen/photo/a135716.html'
     useage = 'Usage: python download.py <url> <username> <password>'
     try:
         url = sys.argv[1]
         username = sys.argv[2]
         password = sys.argv[3]
-    except Exception, e:
+    except IndexError, e:
         print useage
-        return 0
-    album = get(url,username=username,password=password)
+        return None
+    album = get(url, username, password)
     # down album img
     if album:
         try:

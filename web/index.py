@@ -10,6 +10,7 @@ from datetime import timedelta
 from math import ceil
 import os,base64,json
 import requests
+import time
 #
 from db import Database
 from web import app
@@ -64,11 +65,12 @@ def index():
 
 @app.route('/getalbum',methods=['POST'])
 def get():
+    start = time.time()
     url = request.form['url']
     if not detect_album_path(url):
-        return jsonify(state = 2)
-    uid = session.get('uid')
+        return jsonify(state = 5)
     user,pwd = LUSER,LPWD
+    uid = session.get('uid')
     if uid:
         g.cur.execute("""SELECT `uid` FROM `users` where `uid` = %s""",(uid,))
         if g.cur.fetchone():
@@ -78,13 +80,17 @@ def get():
             except KeyError, e:
                 user,pwd = LUSER,LPWD
         else:
-            return jsonify(state = 4) # user non-existent
+            return jsonify(state = 4) # uid non-existent
+    # get pics
     album = HupuAlbum(url)
-    if not album.login(user,pwd):
+    loginfo = album.login(user,pwd)
+    if not loginfo:
         return jsonify(state = 3) # login fail
+    elif type(loginfo) == int:
+        return jsonify(state = loginfo)
     album.save()
-    coverimg=''
-    if album.state==200:
+    coverimg='' # album.cover img to base64
+    if album.state==1:
         # return cover img with base 64 and store data
         cover = album.session.get(album.cover).content
         ext = album.cover.split('.')[-1]
@@ -101,7 +107,8 @@ def get():
         cover = coverimg,
         pics = album.pics,
         get_pics = album.get_pics,
-        pics_urls = album.pics_urls
+        pics_urls = album.pics_urls,
+        time = time.time()-start
     )    
 
 @app.route('/oauth')
@@ -201,7 +208,7 @@ def album():
             # print title.decode('utf-8'),type(title)
             return Response(r.get('picsUrls'),
                 headers = {
-                    'Content-Type': 'text/pain',
+                    'Content-Type': 'text/pain; charset=utf-8',
                     'Content-Disposition': 'attachment; filename="%s.txt"' %title
                 })
         else:
