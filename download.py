@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 #coding: utf-8
-
 import os,sys
 import re
 import urllib2
@@ -8,6 +7,7 @@ from hupu import HupuAlbum
 from hupu import detect_album_path
 # 普通        http://my.hupu.com/hoopchinalv/photo/a1787001.html
 # 只对好友公开 http://my.hupu.com/BelieveMyself/photo/a139390-1.html
+# 加密        http://my.hupu.com/BelieveMyself/photo/a100107-1.html
 # 由来        http://my.hupu.com/sunyatsen/photo/a135716.html
 # 空白测试     http://my.hupu.com/137262/photo/a0-1.html
 # import ipdb
@@ -27,24 +27,22 @@ def get(url, username, password):
     if url:
         album = HupuAlbum(url)
         # login
-        info = album.login(argv['username'],argv['password'])
-        if type(info) == unicode:
+        if album.login(username, password):
             print "登录成功"
-        elif type(info) == int:
-            if info == 302:
-                print "请确认登录用户可以访问此相册吗？"
-                return None
-            if info == 2:
-                print "暂不支持加密相册"
-                return None
         else:
-            print "登陆失败，请检查用户名和密码"
+            tips = {
+                302: "请确认登录用户可以访问此相册吗？",
+                403: "登陆失败，请检查用户名和密码",
+                501: "暂不支持加密相册"
+            }
+            print tips[album.state] # tips
             return None
         # get album info
         info = album.get_info()
         album.title = album.title.encode('utf-8') # str encode
         if info.state == 0:
-            print "空相册抓不到图片"
+            print "《%s》是空相册抓不到图片" %album.title
+            print album.homepage
             return None
         else:            
             print '《%s》此相册有%d张、%d页' %(album.title,album.pics,album.pages)
@@ -83,6 +81,8 @@ def main():
             path = '%s/' %album.title
             save_imgs(album.pics_urls,path,album.get_pics)
         return 1
+    else:
+        return 0
 
 if __name__ == '__main__':
     main()

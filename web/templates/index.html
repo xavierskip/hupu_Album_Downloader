@@ -61,7 +61,7 @@
     <div id="loginModel" class="fix">
         <span class="title">登陆方式</span>
         <div id="wb_connect_btn" >
-            <a href="{{ url_for('oauth') }}"><img src="static/img/sina.png"></a>
+            <a href="{{ url_for('oauth') }}"><img src="{{ url_for('static', filename='img/sina.png') }}"></a>
         </div>
     </div>
 <script>

@@ -11,10 +11,11 @@ from math import ceil
 import os,base64,json
 import requests
 import time
+import re
 #
 from db import Database
 from web import app
-
+# import ipdb
 # weibo login
 APPKEY = app.config.get('APPKEY')
 APPSECRET = app.config.get('APPSECRET')
@@ -68,7 +69,7 @@ def get():
     start = time.time()
     url = request.form['url']
     if not detect_album_path(url):
-        return jsonify(state = 5)
+        return jsonify(state = -1)
     user,pwd = LUSER,LPWD
     uid = session.get('uid')
     if uid:
@@ -83,11 +84,8 @@ def get():
             return jsonify(state = 4) # uid non-existent
     # get pics
     album = HupuAlbum(url)
-    loginfo = album.login(user,pwd)
-    if not loginfo:
-        return jsonify(state = 3) # login fail
-    elif type(loginfo) == int:
-        return jsonify(state = loginfo)
+    if not album.login(user,pwd):
+        return jsonify(state = album.state)
     album.save()
     coverimg='' # album.cover img to base64
     if album.state==1:
@@ -163,7 +161,7 @@ def logout():
 
 @app.route('/albums')
 def albums():
-    imgs = 100.0# how much img in one page , float num
+    imgs = 60.0# how much img in one page , float num
     try:
         currentpage = abs(int(request.args.get('page')))
     except Exception, e:
@@ -192,7 +190,6 @@ def albums():
         pages.extend([i for i in range(rangeStart,rangeEnd+1)])
         pages.extend(['',pagenums])
 
-
     return render_template('albums.html',albums=albums,pages=pages,currentpage=currentpage)
     # return "<h1>UNDER CONSTRUCTION!</h1>"
 
@@ -215,6 +212,41 @@ def album():
             return 'don\'t found!'
     else:
         return abort(400)
+
+@app.route('/zip')
+def zip():
+    '''
+    need nginx module mod_zip  https://github.com/evanmiller/mod_zip
+    '''
+    url = request.args.get('url')
+    if url:
+        g.cur.execute(''' SELECT `title`,`picsUrls` FROM `albums` WHERE `url` = %s''',(url,))
+        r = g.cur.fetchone()
+        if r:
+            title = r.get('title').encode('utf-8')
+            files = r.get('picsUrls').split('\n')
+            fileList = []
+            for f in files:
+                name = f.split('/')[-1]
+                # url = 'http://t.vm'+url_for('static', filename=f)
+                path = '/img/'+re.split('/',f,3)[-1]
+                resp = requests.head(f)
+                size = resp.headers.get('content-length')
+                fileList.append(' '.join(['-',size,path,name]))
+            fs = "\n".join(fileList)
+            # print fs
+            return Response(fs,
+                    headers={
+                        'X-Archive-Files': 'zip',
+                        'Content-Disposition': 'attachment; filename="%s.zip"' %title
+                    }
+                )
+        else:
+            return abort(404)
+    else:
+        return abort(400)
+
+    # return "zip"
 
 @app.route('/donate')
 def donate():

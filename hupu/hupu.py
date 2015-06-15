@@ -18,20 +18,20 @@ def detect_album_path(album_url):
         homepage = 'http://my.hupu.com%s.html' %path
         return homepage
     else:
-        return 0
+        return False
 
 class HupuAlbum(object):
-    g = ''
+    # g = ''
     # session = requests.session()
     def __init__(self, url):
         self.url = url
         # Album info
         self.title = ''
-        self.cover = ''
+        self.cover = '' # cover img url
         self.pics = 0
         self.pages = 0
         self.page_urls = []
-        # Album pics and cover url
+        # Album info acquired
         self.get_pics = 0
         self.pics_urls = ''
         # Album path
@@ -39,9 +39,14 @@ class HupuAlbum(object):
         if match:
             self.path = match.group(1)
             self.homepage = 'http://my.hupu.com%s.html' %self.path
-        self.state = 0 # empty=0 succeed=1
+        else:
+            self.state = -1
+        # unknow=-1 init|empty=0 succeed=1
+        # private=302 login_fail=403 encrypt=501
+        self.state = 0 
         # requests session
         self.session = requests.session()
+        self.g = ''
         headers = {
             # 'Host': 'passport.hupu.com',
             # 'Origin': 'http://passport.hupu.com',
@@ -57,12 +62,16 @@ class HupuAlbum(object):
         self.session.cookies.update(cookies)
         r = self.session.get(url)
         if len(r.history) > 0 and r.history[0].status_code == 302:
-            return 302
+            self.state = 302 #相册内容不公开
+            return False
         elif re.search(u'很抱歉，当前页面正在维护中，请稍后再来', r.text):
-            return None
+            self.state = 403 #登录失败
+            return False
         elif re.search(u'你输入的密码错误，请重新输入', r.text):
-            return 2
+            self.state = 501 #暂不支持加密相册
+            return False
         else:
+            self.state = 1
             return r.text
 
     def getCookie(self, url, payload):
@@ -74,7 +83,7 @@ class HupuAlbum(object):
             self.cookieconfig.save() # save cookie
             return cookies
         else:
-            return None
+            return False
 
     def login(self,user,password):
     	login = "http://passport.hupu.com/login"
@@ -88,29 +97,32 @@ class HupuAlbum(object):
         }
         self.cookieconfig = Cookie()
         if self.cookieconfig.has_user(user):
-            # print "get %s cookieconfig" %user
             loginCookie = self.cookieconfig.getcookies(user)
             self.content = self.get(self.homepage, loginCookie)
             if self.content:
-                # print "%s cookie userful" %user
-                return self.content
+                self.g += self.content # album first page
+                return True
             else:
-                # print "%s cookie wrong" %user
-                loginCookie = self.getCookie(login, payload)
-                if not loginCookie:
-                    # print "%s login fail" %user
-                    self.cookieconfig.remove(user)
-                    return None # login fail
-                # print "freshen %s cookie" %user
+                if self.state == 403:# expired cookie then login fail
+                    loginCookie = self.getCookie(login, payload)
+                    if not loginCookie:
+                        self.cookieconfig.remove(user)
+                        return False # login fail
+                    # if get cookie than skip the judgment
+                else:
+                    # login succeed but can't access the album
+                    return False
         else:
-            # print "%s cookieconfig not found" %user
             loginCookie = self.getCookie(login, payload)
             if not loginCookie:
-                # print"login fail %s" %user
-                return None # login fail
-        # print "%s user new cookies" %user
+                return False # login fail
+            # if get cookie than skip the judgment
         self.content = self.get(self.homepage, loginCookie)
-        return self.content
+        if self.content:
+            self.g += self.content
+            return True
+        else:
+            return False
 
     def get_info(self):
     	page = self.content
@@ -132,26 +144,28 @@ class HupuAlbum(object):
         self.page_urls = ['http://my.hupu.com%s-%d.html' %(self.path,i) for i in range(1,self.pages+1)]
         # album empty
         if self.pics == 0:
+            self.state = 0 # empty album
             return self
         else:
             self.state = 1
             return self
 
     def down(self):
-        # get_pages with threads
+        # get all album page content with threads
         threads = []
-        for url in self.page_urls:
-            t = self.GetUrlThread(url, self.session)
+        # skip the first page because it be taken when login
+        for i in range(1,len(self.page_urls)):
+            t = GetUrlThread(self, self.page_urls[i])
             threads.append(t)
             t.start()
         for t in threads:
-            t.join(timeout=60)
+            t.join(timeout=20)
         # filter img
         img_list = re.findall('<span>.+?<img src="(.+?)"',self.g)
         self.get_pics = len(img_list)
         self.pics_urls = re.sub('small.', 'big.', '\n'.join(img_list))
         # clear g ! important !!! 
-        HupuAlbum.g = ''
+        # HupuAlbum.g = ''
         return self.pics_urls
 
     def save(self):
@@ -159,16 +173,17 @@ class HupuAlbum(object):
         self.down()
         return self
 
-    # Thread
-    class GetUrlThread(Thread):
-        def __init__(self, url, session):
-            self.url = url
-            self.session = session
-            super(HupuAlbum.GetUrlThread, self).__init__()
-     
-        def run(self):
-            response = self.session.get(self.url)
-            HupuAlbum.g += response.content # global g
+# Thread
+class GetUrlThread(Thread):
+    def __init__(self, cls, url):
+        self.url = url
+        self.cls = cls
+        self.session = cls.session
+        super(GetUrlThread, self).__init__()
+ 
+    def run(self):
+        response = self.session.get(self.url)
+        self.cls.g += response.text
 
 class Cookie(object):
     def __init__(self):

@@ -46,7 +46,3 @@ LASTDATE = '2014-10-19'
 LUSER = [username]
 LPWD = [password]
 ```
-
-
-
-
