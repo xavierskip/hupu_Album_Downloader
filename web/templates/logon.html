@@ -13,6 +13,7 @@
 </head>
 <body>
     <div id="body">
+        <!-- user info -->
         <div id="userinfo" class="dropdown">
             <a class="avatar" data-toggle="dropdown" href="#">
                 <img src="{{ user.avatar }}" title="{{ user.name }}" alt="{{ user.name }}">
@@ -25,6 +26,7 @@
         <div >
             <a href="javascript:void(0)" id="infobar"></a>
         </div>
+        <!-- content -->
         <div id="wrap">
             <header>相册图片抓取器</header>
             <div id="console">
@@ -58,14 +60,17 @@
                 </article>
             </div>
         </div>
-        <div id="link1" class='links'>
-            <p>
-                <a href="{{ url_for('albums') }}">抓取历史</a>
-            </p>
+        <div class="tabs">
+            <div id="link1" class='links'>
+                <p>
+                    <a href="{{ url_for('albums') }}">抓取历史</a>
+                </p>
+            </div>
+            <span class="clear"></span>
         </div>
     </div>
     <footer>
-        powered by <a  class="a" href="http://developer.baidu.com/bae">bae</a> & <a class="a" href="http://flask.pocoo.org/">flask</a> | last update {{ lastDate }} | <a class="a" href="mailto:xavierskip@gmail.com?Subject=BUG:" target="_blank">反馈</a>
+        如果本工具对您有帮助，希望您能够<a  class="a" href="{{ url_for('donate') }}">捐助</a>此工具| Last updated <span id="lastDate">{{ lastDate }}</span> | <a class="a" href="mailto:xavierskip@gmail.com?Subject=BUG:" target="_blank">反馈</a>
     </footer>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

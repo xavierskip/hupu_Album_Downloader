@@ -13,6 +13,7 @@
 </head>
 <body>
     <div id="body">
+        <!-- content -->
         <div id="wrap">
             <header>相册图片抓取器</header>
             <div id="console">
@@ -41,6 +42,7 @@
                 </article>
             </div>
         </div>
+        <!-- navigation tabs -->
         <div class="tabs">
             <div id="link1" class='links'>
                 <p>
@@ -55,9 +57,11 @@
             <span class="clear"></span>
         </div>
     </div>
+    <!-- footer -->
     <footer>
-        如果本工具对您有帮助，希望您能够<a  class="a" href="{{ url_for('donate') }}">捐助</a>此工具| Last updated {{ lastDate }} | <a class="a" href="mailto:xavierskip@gmail.com?Subject=BUG:" target="_blank">反馈</a>
+        如果本工具对您有帮助，希望您能够<a  class="a" href="{{ url_for('donate') }}">捐助</a>此工具| Last updated <span id="lastDate">{{ lastDate }}</span> | <a class="a" href="mailto:xavierskip@gmail.com?Subject=BUG:" target="_blank">反馈</a>
     </footer>
+    <!-- login box -->
     <div id="loginModel" class="fix">
         <span class="title">登陆方式</span>
         <div id="wb_connect_btn" >
