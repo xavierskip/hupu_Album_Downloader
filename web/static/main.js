@@ -2,7 +2,7 @@ String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); };
 
 $(document).ready(function(){
 
-var output = document.getElementById('output')
+var output = document.getElementById('output');
 
 var states = {
     '-1':'此URL不能识别\n请输入单个相册的页面地址!\nurl like this:http://my.hupu.com/sunyatsen/photo/a135716.html',
@@ -11,8 +11,7 @@ var states = {
     '4': 'user id non-existent',
     '302': '请确认，此相册只否公开，还是只对好友公开?\n指定用户抓取，请使用高级功能',
     '403': 'login fail',
-    '501': '暂不支持抓取加密相册',
-
+    '501': '暂不支持抓取加密相册'
 }
 
 function draw(response){
@@ -24,14 +23,14 @@ function draw(response){
     }else{
         output.value = states[response.state];
     }    
-}
+};
 
 function cleardraw(){
     output.value = '';
     $('#albumcover').attr('src','');
     $('#albumtitle').html('');
     $('#albumpics').html('');
-}
+};
 
 $('#crawl').bind('click',function(){
     cleardraw()
@@ -59,11 +58,11 @@ $('#crawl').bind('click',function(){
 // login model
 var m = $('#loginModel');
 $('html').click(function() {
-    m.hide()
+    m.hide();
 });
 $("#loginModel").click(function(){
     event.stopPropagation();
-})
+});
 $("[href='#login-model']").click(function(){
     event.stopPropagation();
     if(m.css('display') == 'none'){
@@ -71,12 +70,12 @@ $("[href='#login-model']").click(function(){
     }else{
         m.css('display','none');
     }
-})
+});
 // last update
 $.ajax({
     url:'https://api.github.com/repos/xavierskip/hupu_Album_Downloader'
 }).done(function(b){
     $("#lastDate").text(b["pushed_at"].split('T')[0]);
-})
+});
 
 });

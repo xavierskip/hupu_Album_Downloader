@@ -83,6 +83,7 @@ class HupuAlbum(object):
             self.cookieconfig.save() # save cookie
             return cookies
         else:
+            self.state = 403 #登录失败
             return False
 
     def login(self,user,password):
