@@ -78,6 +78,8 @@ def get():
             try:
                 user = request.form['user']
                 pwd = request.form['password']
+                if user or pwd:
+                    raise KeyError
             except KeyError, e:
                 user,pwd = LUSER,LPWD
         else:
