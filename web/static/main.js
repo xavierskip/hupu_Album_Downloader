@@ -3,7 +3,8 @@ String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); };
 $(document).ready(function(){
 
 var output = document.getElementById('output');
-
+var title = $('title');
+var share = $('#sharetab');
 var states = {
     '-1':'此URL不能识别\n请输入单个相册的页面地址!\nurl like this:http://my.hupu.com/sunyatsen/photo/a135716.html',
     '0': '空相册,什么都没有找到？',
@@ -12,14 +13,15 @@ var states = {
     '302': '请确认，此相册只否公开，还是只对好友公开?\n指定用户抓取，请使用高级功能',
     '403': 'login fail',
     '501': '暂不支持抓取加密相册'
-}
-
+};
 function draw(response){
     if(response.state == 1 || response.state == 0){
         output.value = response.pics_urls;
         $('#albumcover').attr('src',response.cover);
         $('#albumtitle').html('《'+response.title+'》'+'有'+response.pics+'张图片');
         $('#albumpics').html('抓取出'+response.get_pics+'张图片');
+        share.show();
+        title.text('《'+response.title+'》'+response.homepage+'中有'+response.get_pics+'张图片。抓取工具:'+location.href)
     }else{
         output.value = states[response.state];
     }    
@@ -30,6 +32,7 @@ function cleardraw(){
     $('#albumcover').attr('src','');
     $('#albumtitle').html('');
     $('#albumpics').html('');
+    share.hide();
 };
 
 $('#crawl').bind('click',function(){

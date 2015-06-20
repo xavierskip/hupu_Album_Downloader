@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:wb="http://open.weibo.com/wb">
 <head>
     <meta charset="utf-8">
     <title>虎扑相册图片抓取器</title>
@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css">
     <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
     <script src="/static/main.js"></script>
+    <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
     <div id="body">
@@ -40,6 +41,9 @@
                     <p id="albumtitle"></p>
                     <p id="albumpics"></p>
                 </article>
+                <div id="sharetab" style="display: none;">
+                    <wb:share-button appkey="4109392084" addition="number" type="button" language="zh_cn"></wb:share-button>
+                </div>
             </div>
         </div>
         <!-- navigation tabs -->
