@@ -75,12 +75,9 @@ def get():
     if uid:
         g.cur.execute("""SELECT `uid` FROM `users` where `uid` = %s""",(uid,))
         if g.cur.fetchone():
-            try:
-                user = request.form['user']
-                pwd = request.form['password']
-                if user or pwd:
-                    raise KeyError
-            except KeyError, e:
+            user = request.form.get('user')
+            pwd = request.form.get('password')
+            if not user or not pwd :
                 user,pwd = LUSER,LPWD
         else:
             return jsonify(state = 4) # uid non-existent
