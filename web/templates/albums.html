@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>查询历史</title>
-    <meta name="keywords" content="hupu,hoopchina,albums,picture,spider,crawl,虎扑,相册,抓图">
-    <meta name="description" content="download hoopchina.com users's albums pictures">
-    <meta name="author" content="Xavier skip">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
-    <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
+{% extends "base.html" %}
+{% block title%}相册抓取记录{% endblock title%}
+{% block head -%}
+{{ super() }}
+    <link href="//cdn.bootcss.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
         body{
             font-size: 13px;
@@ -54,47 +48,37 @@
             cursor: default;
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <div class="page-header">
-            <h1>抓取历史 <small><a href="{{url_for('index')}}"> 回首页</a></small></h1>
-        </div>
-        <ul class="album_list">
-            {% for album in albums %}
-                <li>
-                    <a href="{{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
-                    <p class="title">
-                    <a href="{{url_for('album')}}?url={{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
-                    </p>
-                    <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
-                    
-                </li>
-            {% else %}
-                <em>怎么会没有呢？</em>
-            {% endfor %}
-        </ul>
-        <footer>
-            <ul class="pagination">
-                {% for p in pages %}
-                    {% if not p %}
-                        <li class="disabled"><span aria-hidden="true">...</span></a></li>
-                    {% elif p == currentpage%}
-                        <li class="active" ><a href="{{url_for('albums')}}?page={{p}}">{{p}}<span class="sr-only">(current)</span></a></li>
-                    {% else %}
-                        <li><a href="{{url_for('albums')}}?page={{p}}">{{p}}</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </footer>
+{%- endblock head %}
+{%- block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>抓取历史 <small><a href="{{url_for('index')}}"> 回首页</a></small></h1>
     </div>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-56936423-1', 'auto');
-  ga('send', 'pageview');
-</script>
-</body>
-</html>
+    <ul class="album_list">
+        {% for album in albums -%}
+            <li>
+                <a href="{{url_for('preview')}}?url={{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
+                <p class="title">
+                <a href="{{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
+                </p>
+                <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
+            </li>
+        {% else %}
+            <em>怎么会没有呢？</em>
+        {%- endfor %}
+    </ul>
+    <footer>
+        <ul class="pagination">
+            {%- for p in pages %}
+                {% if not p -%}
+                    <li class="disabled"><span aria-hidden="true">...</span></a></li>
+                {%- elif p == currentpage -%}
+                    <li class="active" ><a href="{{url_for('albums')}}?page={{p}}">{{p}}<span class="sr-only">(current)</span></a></li>
+                {%- else -%}
+                    <li><a href="{{url_for('albums')}}?page={{p}}">{{p}}</a></li>
+                {%- endif -%}
+            {%- endfor %}
+        </ul>
+    </footer>
+</div>
+{% endblock body -%}

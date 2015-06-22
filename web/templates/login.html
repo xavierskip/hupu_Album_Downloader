@@ -1,0 +1,36 @@
+{% extends "page.html" %}
+{% block userinfo %}
+    <!-- user info -->
+    <div id="userinfo" class="dropdown">
+        <a class="avatar" data-toggle="dropdown" href="#">
+            <img src="{{ user.avatar }}" title="{{ user.name }}" alt="{{ user.name }}">
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            <li>{{ user.name }}</li>
+            <li><a href="/logout">退出</a></li>
+        </ul>
+    </div>
+    <div >
+        <a href="javascript:void(0)" id="infobar"></a>
+    </div>
+{% endblock userinfo %}
+{% block label %}
+    <label>
+        <input type="text" name="albumurl" placeholder="相册URL">
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+    </label>
+{% endblock label %}
+{% block tips %}
+    <p class="tips">username 和 password 为空则用默认帐号抓取。</p>
+{% endblock tips %}
+{% block nav %}
+    <div class="tabs">
+        <div id="link1" class='links'>
+            <p>
+                <a href="{{ url_for('albums') }}">抓取历史</a>
+            </p>
+        </div>
+        <span class="clear"></span>
+    </div>
+{% endblock nav %}

@@ -46,7 +46,7 @@ textarea:focus {
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.075),0 0 5px rgba(232, 166, 81, 0.64);
     outline: none;
 }
-#body {
+#main {
     width: 960px;
     border-left: 1px dashed #ccc;
     border-right: 1px dashed #ccc;

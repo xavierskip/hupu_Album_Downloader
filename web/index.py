@@ -60,9 +60,9 @@ def index():
                 'name': f.get('name'),
                 'avatar': f.get('avatar')
             }
-            return render_template('logon.html',user=user,lastDate=LASTDATE)
+            return render_template('login.html',user=user,lastDate=LASTDATE)
     else:
-        return render_template('index.html',lastDate=LASTDATE)
+        return render_template('home.html',lastDate=LASTDATE)
 
 @app.route('/getalbum',methods=['POST'])
 def get():
@@ -89,9 +89,10 @@ def get():
     coverimg='' # album.cover img to base64
     if album.state==1:
         # return cover img with base 64 and store data
-        cover = album.session.get(album.cover).content
-        ext = album.cover.split('.')[-1]
-        coverimg = img_base64(cover,ext)
+        # cover = album.session.get(album.cover).content
+        # ext = album.cover.split('.')[-1]
+        # coverimg = img_base64(cover,ext)
+        coverimg = album.cover
         g.cur.execute(''' INSERT INTO  `albums` (`url`,`title`,`cover`,`pics`,`getPics`,`picsUrls`) VALUES (%s,%s,%s,%s,%s,%s)\
             ON DUPLICATE KEY UPDATE `title`=%s,`cover`=%s,`pics`=%s,`getPics`=%s,`picsUrls`=%s,`times`=`times`+1 ''',
             (album.homepage,album.title,coverimg,album.pics,album.get_pics,album.pics_urls,
@@ -163,7 +164,7 @@ def albums():
     imgs = 60.0# how much img in one page , float num
     try:
         currentpage = abs(int(request.args.get('page')))
-    except Exception, e:
+    except TypeError, e:
         currentpage = 1
     imgstart,imgend = ( int((currentpage-1)*imgs),int(imgs))
     g.cur.execute('''SELECT count(*) from `albums`''')
@@ -192,8 +193,33 @@ def albums():
     return render_template('albums.html',albums=albums,pages=pages,currentpage=currentpage)
     # return "<h1>UNDER CONSTRUCTION!</h1>"
 
-@app.route('/album')
-def album():
+@app.route('/preview')
+def preview():
+    count = 60
+    url = request.args.get('url')
+    try:
+        page = abs(int(request.args.get('p')))
+    except TypeError, e:
+        page = 0
+    print 'page',page
+    if url:
+        g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''',(url,))
+        r = g.cur.fetchone()
+        if r:
+            imgs = r.get('picsUrls').split('\n')#[0:20]
+            thumbnails = re.sub( 'big.', 'small.', r.get('picsUrls')).split('\n')#[0:20]
+            return render_template('preview.html',
+                    title = r.get('title'),
+                    imgs = thumbnails,
+                    url = url
+                )
+        else:
+            return 'don\'t found!'
+    else:
+        return abort(400)
+
+@app.route('/getalbum')
+def getalbum():
     url = request.args.get('url')
     if url:
         g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''',(url,))

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title%}{{ title }}{% endblock title%}
+{% block head -%}
+{{ super() }}
+    <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        .grid-item { width: 130px; margin-bottom: 15px;}
+        .grid-item img { box-shadow: 2px 2px 4px #646363; cursor: pointer;}
+        .mask-bg {
+            background: #0b0b0b;
+            opacity: .9;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            height: 100%;
+            width: 100%;
+            display: none;
+            overflow: hidden;
+        }
+        .mask-wrap{
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            display: none;
+            cursor: zoom-out;
+        }
+        .mask-content {
+            max-width: 100%;  
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 auto;
+            text-align: left;
+            z-index: 1045;          
+        }
+        .mask-wrap img{
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            line-height: 0;
+            padding: 40px 0;
+            margin: 0 auto;
+            position: relative;
+            vertical-align: middle; 
+            text-align: left;
+            z-index: 1045;  
+            cursor: pointer;     
+        }
+    </style>
+    <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="{{ url_for('static', filename='imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='masonry.pkgd.min.js') }}"></script>
+{%- endblock head %}
+{% block body %}
+<div class="container">
+    <h2><a href="{{ url }}">{{ title }}</a><small><a href="{{url_for('albums')}}" class="glyphicon glyphicon-off" aria-hidden="true"> </a></small></h2>
+    <p>
+    download: <a href="{{url_for('getalbum')}}?url={{ url }}">txt</a>|<a href="{{url_for('zip')}}?url={{ url }}">zip</a>
+    </p>
+    <div class="grid">
+    {%- for img in imgs %}
+        <div class="grid-item"><img src="{{ img }}"></div>
+    {% endfor -%}
+    </div>
+</div>
+<div class="mask-bg"></div>
+<div class="mask-wrap">
+    <div class="mask-content">
+        <img src="">        
+    </div>
+</div>
+{% endblock body %}
+{% block script %}
+<script type="text/javascript">
+    var $grid = $('.grid').masonry({
+      // options
+      itemSelector: '.grid-item',
+      columnWidth: 130,
+      gutter: 23,
+      transitionDuration: '0.2s'
+    });
+    // layout Masonry after each image loads
+    $grid.imagesLoaded().progress( function() {
+      $grid.masonry('layout');
+    });
+    var currentNode;
+    var f = false;
+    var mask = $(".mask-bg");
+    var wrap = $(".mask-wrap");
+    var showimg = $(".mask-wrap img");
+    $(".grid-item").on("click",function(){
+        showIMG();
+        getIMG(this);
+    });
+    $(document).keydown(function(e){
+        console.log(e.keyCode);
+        var n;
+        if(f){
+            if(e.keyCode==37){
+                (n = $(currentNode).prev()[0]) ? getIMG(n) : console.log('next end');
+            }
+            else if(e.keyCode==39){
+                (n = $(currentNode).next()[0]) ? getIMG(n) : console.log('next end');
+            }
+        }
+    })
+    $(window).resize(function(){
+        showimg.css('max-height',wrap.height());
+        console.log(wrap.height());
+    });
+    wrap.click(closeIMG);
+    showimg.click(function(){
+        event.stopPropagation();
+        var node = $(currentNode).next()[0];
+        getIMG(node);
+    });
+    function getIMG(node){
+        currentNode = node;
+        var img = node.querySelector('img');
+        var src = img.src.replace(/small\./,'big.');
+        showimg.attr("src",src);
+        showimg.css('max-height',wrap.height());
+    };
+    function showIMG(){
+        mask.show();
+        wrap.show();
+        f = !f;
+        $('body').css('overflow','hidden');
+    }
+    function closeIMG(){
+        mask.hide();
+        wrap.hide();
+        showimg.attr("src","");
+        f = !f;
+        $('body').css('overflow','')
+    }
+</script>
+{% endblock script %}
+</body>
+</html>

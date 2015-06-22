@@ -1,0 +1,32 @@
+{% extends "page.html" %}
+{% block label %}
+    <label>相册URL: <input type="text" name="albumurl" size=50></label>
+{% endblock label %}
+{% block tips %}
+    <p class="tips">like this:<a class="a" class="a" href="http://my.hupu.com/sunyatsen/photo/a135716.html" target="blank">http://my.hupu.com/sunyatsen/photo/a135716.html</a></p>
+{% endblock tips %}
+{% block nav %}
+    <!-- navigation tabs -->
+    <div class="tabs">
+        <div id="link1" class='links'>
+            <p>
+                <a href="{{ url_for('albums') }}">抓取历史</a>
+            </p>
+        </div>
+        <div id="link2" class='links'>
+            <p>
+                <a href="#login-model">登陆抓取</a>
+            </p>
+        </div>
+        <span class="clear"></span>
+    </div>
+{% endblock nav %}
+{% block popup %}
+    <!-- login box -->
+    <div id="loginModel" class="fix">
+        <span class="title">登陆方式</span>
+        <div id="wb_connect_btn" >
+            <a href="{{ url_for('oauth') }}"><img src="{{ url_for('static', filename='img/sina.png') }}"></a>
+        </div>
+    </div>
+{% endblock popup %}
