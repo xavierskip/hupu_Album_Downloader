@@ -4,9 +4,9 @@
 {{ super() }}
     <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
-        .grid-item { width: 130px; margin-bottom: 15px;}
+        .grid-item { width: 130px; margin-bottom: 23px;}
         .grid-item img { box-shadow: 2px 2px 4px #646363; cursor: pointer;}
-        .mask-bg {
+        .overlay {
             background: #0b0b0b;
             opacity: .9;
             position: fixed;
@@ -17,7 +17,7 @@
             display: none;
             overflow: hidden;
         }
-        .mask-wrap{
+        .previewBox{
             text-align: center;
             position: fixed;
             width: 100%;
@@ -36,19 +36,55 @@
             text-align: left;
             z-index: 1045;          
         }
-        .mask-wrap img{
+        .previewBox>.mask-content img{
             width: auto;
             max-width: 100%;
             height: auto;
             display: block;
             line-height: 0;
-            padding: 40px 0;
+            padding: 7px 0;
             margin: 0 auto;
             position: relative;
             vertical-align: middle; 
             text-align: left;
             z-index: 1045;  
             cursor: pointer;     
+        }
+        .mask-load {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            text-align: center;
+            line-height: 0;
+        }
+        .loading {
+            width: 3px; height:3px;
+            border-radius: 100%;      
+            box-shadow:
+            0 -10px 0 #666,  
+            10px 0px #666,   
+            0 10px #666, 
+            -10px 0 #666,                          
+            -7px -7px 0 #666, 
+            7px -7px 0 #666,                     
+            7px 7px #666, 
+            -7px 7px #666;
+            position: relative;
+            top: -5px;  
+        }
+        .spin {
+            transform: rotate(360deg);
+            animation: spin 1s linear infinite;
+            -webkit-transform: rotate(360deg);
+            -webkit-animation: spin 1s linear infinite; 
+        }
+        @keyframes spin {
+            from {transform: rotate(0deg);}
+              to {transform: rotate(360deg);}
+        }
+        @-webkit-keyframes spin {
+            from {-webkit-transform: rotate(0deg);}
+              to {-webkit-transform: rotate(360deg);}
         }
     </style>
     <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
@@ -57,7 +93,7 @@
 {%- endblock head %}
 {% block body %}
 <div class="container">
-    <h2><a href="{{ url }}">{{ title }}</a><small><a href="{{url_for('albums')}}" class="glyphicon glyphicon-off" aria-hidden="true"> </a></small></h2>
+    <h2><a href="{{ url }}">{{ title }}</a><small>共{{ count }}张<a href="{{url_for('albums')}}" class="glyphicon glyphicon-off" aria-hidden="true"> </a></small></h2>
     <p>
     download: <a href="{{url_for('getalbum')}}?url={{ url }}">txt</a>|<a href="{{url_for('zip')}}?url={{ url }}">zip</a>
     </p>
@@ -67,11 +103,12 @@
     {% endfor -%}
     </div>
 </div>
-<div class="mask-bg"></div>
-<div class="mask-wrap">
+<div class="overlay"></div>
+<div class="previewBox">
     <div class="mask-content">
         <img src="">        
     </div>
+    <div class="mask-load"><p class="loading spin"></p></div>
 </div>
 {% endblock body %}
 {% block script %}
@@ -84,57 +121,74 @@
       transitionDuration: '0.2s'
     });
     // layout Masonry after each image loads
-    $grid.imagesLoaded().progress( function() {
+    $grid.imagesLoaded().progress( function( instance, image) {
       $grid.masonry('layout');
+      image.isLoaded ? 'loaded' : console.log( 'image is ' + result + ' for ' + image.img.src );
+      
     });
-    var currentNode;
-    var f = false;
-    var mask = $(".mask-bg");
-    var wrap = $(".mask-wrap");
-    var showimg = $(".mask-wrap img");
+    // single img showbox
+    var currentNode;//img node
+    var f = false;//previewBox yes or no
+    var mask = $(".overlay");
+    var box = $(".previewBox");
+    var viewimg = $(".previewBox .mask-content img");
+    var loader = $('.mask-load')
     $(".grid-item").on("click",function(){
         showIMG();
         getIMG(this);
     });
     $(document).keydown(function(e){
-        console.log(e.keyCode);
-        var n;
+        // console.log(e.keyCode);
         if(f){
             if(e.keyCode==37){
-                (n = $(currentNode).prev()[0]) ? getIMG(n) : console.log('next end');
+                prevImg();
             }
             else if(e.keyCode==39){
-                (n = $(currentNode).next()[0]) ? getIMG(n) : console.log('next end');
+                nextImg();
             }
         }
     })
     $(window).resize(function(){
-        showimg.css('max-height',wrap.height());
-        console.log(wrap.height());
+        viewimg.css('max-height',box.height());
+        // console.log(box.height());
     });
-    wrap.click(closeIMG);
-    showimg.click(function(){
+    box.click(closeBox);
+    viewimg.click(function(){
         event.stopPropagation();
-        var node = $(currentNode).next()[0];
-        getIMG(node);
+        nextImg();
     });
     function getIMG(node){
+        loader.show();
+        viewimg.hide();
         currentNode = node;
         var img = node.querySelector('img');
         var src = img.src.replace(/small\./,'big.');
-        showimg.attr("src",src);
-        showimg.css('max-height',wrap.height());
+        viewimg.attr("src",src);
+        viewimg.imagesLoaded()
+        .always(function(){
+            viewimg.show();
+            loader.hide();
+        });
+        viewimg.css('max-height',box.height());
     };
+    function prevImg(){
+        var n;
+        (n = $(currentNode).prev()[0]) ? getIMG(n) : console.log('to head');
+    }
+    function nextImg(){
+        var n;
+        (n = $(currentNode).next()[0]) ? getIMG(n) : console.log('to end');
+    }; 
     function showIMG(){
         mask.show();
-        wrap.show();
+        box.show();
         f = !f;
         $('body').css('overflow','hidden');
     }
-    function closeIMG(){
+    function closeBox(){
         mask.hide();
-        wrap.hide();
-        showimg.attr("src","");
+        box.hide();
+        viewimg.attr("src","");
         f = !f;
         $('body').css('overflow','')
     }

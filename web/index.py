@@ -203,15 +203,16 @@ def preview():
         page = 0
     print 'page',page
     if url:
-        g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''',(url,))
+        g.cur.execute(''' SELECT `picsUrls`,`title`,`pics` FROM `albums` WHERE `url` = %s''',(url,))
         r = g.cur.fetchone()
         if r:
-            imgs = r.get('picsUrls').split('\n')#[0:20]
+            count = r.get('pics')
             thumbnails = re.sub( 'big.', 'small.', r.get('picsUrls')).split('\n')#[0:20]
             return render_template('preview.html',
                     title = r.get('title'),
                     imgs = thumbnails,
-                    url = url
+                    url = url,
+                    count = count
                 )
         else:
             return 'don\'t found!'
