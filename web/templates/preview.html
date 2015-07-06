@@ -166,9 +166,11 @@
             size();
         })
         .progress(function(){
-            // pre-load img 
-            var preimg = new Image();
-            preimg.src = preload.querySelector('img').src.replace(/small\./,'big.');
+            // pre-load img
+            preload ? (function(){
+                var preimg = new Image();
+                preimg.src = preload.querySelector('img').src.replace(/small\./,'big.');
+            })() : 1
         });
     };
     function prevImg(){
