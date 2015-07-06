@@ -30,24 +30,15 @@
         .mask-content {
             max-width: 100%;  
             position: relative;
+            top: 50%;
             display: inline-block;
             vertical-align: middle;
             margin: 0 auto;
             text-align: left;
-            z-index: 1045;          
+            z-index: 1045;
+            transition:margin .1s ease-out;          
         }
-        .previewBox>.mask-content img{
-            width: auto;
-            max-width: 100%;
-            height: auto;
-            display: block;
-            line-height: 0;
-            padding: 7px 0;
-            margin: 0 auto;
-            position: relative;
-            vertical-align: middle; 
-            text-align: left;
-            z-index: 1045;  
+        .previewBox>.mask-content img{ 
             cursor: pointer;     
         }
         .mask-load {
@@ -131,6 +122,7 @@
     var f = false;//previewBox yes or no
     var mask = $(".overlay");
     var box = $(".previewBox");
+    var vc = $(".mask-content")
     var viewimg = $(".previewBox .mask-content img");
     var loader = $('.mask-load')
     $(".grid-item").on("click",function(){
@@ -148,15 +140,18 @@
             }
         }
     })
-    $(window).resize(function(){
-        viewimg.css('max-height',box.height());
-        // console.log(box.height());
-    });
+    $(window).resize( size );
     box.click(closeBox);
     viewimg.click(function(){
         event.stopPropagation();
         nextImg();
     });
+    function size(){
+        viewimg.css('max-height',box.height());
+        viewimg.css('max-width',box.width());
+        var h = vc.height()/2;
+        vc.css('margin-top',-h);
+    };
     function getIMG(node){
         loader.show();
         viewimg.hide();
@@ -168,8 +163,8 @@
         .always(function(){
             viewimg.show();
             loader.hide();
+            size();
         });
-        viewimg.css('max-height',box.height());
     };
     function prevImg(){
         var n;
