@@ -152,7 +152,7 @@
         var h = vc.height()/2;
         vc.css('margin-top',-h);
     };
-    function getIMG(node){
+    function getIMG(node, preload){
         loader.show();
         viewimg.hide();
         currentNode = node;
@@ -164,27 +164,20 @@
             viewimg.show();
             loader.hide();
             size();
+        })
+        .progress(function(){
+            // pre-load img 
+            var preimg = new Image();
+            preimg.src = preload.querySelector('img').src.replace(/small\./,'big.');
         });
     };
     function prevImg(){
-        var n = $(currentNode).prev()[0];
-        if(n){
-            getIMG(n);
-            var preimg = new Image();
-            preimg.src = $(n).prev()[0].querySelector('img').src.replace(/small\./,'big.');
-        }else{
-            console.log('to head');
-        }
+        var n;
+        (n = $(currentNode).prev()[0]) ? getIMG(n, $(n).prev()[0]) : console.log('to head');
     }
     function nextImg(){
-        var n = $(currentNode).next()[0];
-        if(n){
-            getIMG(n);
-            var preimg = new Image();
-            preimg.src = $(n).next()[0].querySelector('img').src.replace(/small\./,'big.');    
-        }else{
-            console.log('to end');
-        }
+        var n;
+        (n = $(currentNode).next()[0]) ? getIMG(n, $(n).next()[0]) : console.log('to end');
     }; 
     function showIMG(){
         mask.show();
