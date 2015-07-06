@@ -167,12 +167,24 @@
         });
     };
     function prevImg(){
-        var n;
-        (n = $(currentNode).prev()[0]) ? getIMG(n) : console.log('to head');
+        var n = $(currentNode).prev()[0];
+        if(n){
+            getIMG(n);
+            var preimg = new Image();
+            preimg.src = $(n).prev()[0].querySelector('img').src.replace(/small\./,'big.');
+        }else{
+            console.log('to head');
+        }
     }
     function nextImg(){
-        var n;
-        (n = $(currentNode).next()[0]) ? getIMG(n) : console.log('to end');
+        var n = $(currentNode).next()[0];
+        if(n){
+            getIMG(n);
+            var preimg = new Image();
+            preimg.src = $(n).next()[0].querySelector('img').src.replace(/small\./,'big.');    
+        }else{
+            console.log('to end');
+        }
     }; 
     function showIMG(){
         mask.show();
