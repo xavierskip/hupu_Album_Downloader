@@ -4,11 +4,17 @@
 {{ super() }}
     <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
-        .grid-item { width: 130px; margin-bottom: 23px;}
-        .grid-item img { box-shadow: 2px 2px 4px #646363; cursor: pointer;}
+        .grid-item { 
+            width: 130px; 
+            margin-bottom: 23px;
+        }
+        .grid-item img { 
+            box-shadow: 2px 2px 4px #646363;
+            cursor: pointer;
+        }
         .overlay {
             background: #0b0b0b;
-            opacity: .9;
+            opacity: 1;
             position: fixed;
             left: 0px;
             top: 0px;
@@ -26,6 +32,7 @@
             top: 0;
             display: none;
             cursor: zoom-out;
+            cursor: -webkit-zoom-out;
         }
         .mask-content {
             max-width: 100%;  
@@ -34,19 +41,58 @@
             display: inline-block;
             vertical-align: middle;
             margin: 0 auto;
-            text-align: left;
-            z-index: 1045;
-            transition:margin .1s ease-out;          
+            text-align: left;    
         }
         .previewBox>.mask-content img{ 
-            cursor: pointer;     
+            cursor: pointer;
+            animation: fadeIn 0.8s ease forwards;
+            -webkit-animation: fadeIn 0.8s ease forwards;
         }
-        .mask-load {
+        .mask-content>.tips{
+            display: none;
+            padding: 3px;
             position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+/*        .tips,.animate{
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+            -webkit-transform: scale(0.4);
+            transform: scale(0.4);
+            -webkit-animation: popUp .4s ease-in forwards;
+            animation: popUp .4s ease-in forwards;
+        }*/
+        .mask-load {
+            position: fixed;
             top: 50%;
             left: 50%;
             text-align: center;
             line-height: 0;
+        }
+        #control{
+            position: fixed;
+            left: 3px;
+            bottom: -23px;
+            padding: 5px 3px 2px 3px;
+            padding-left: 3px;
+            padding-right: 3px; 
+            line-height: 20px;
+            background: #FFF;
+            /*opacity: 0.7;*/
+            transition: all .3s ease-out;
+            z-index: 1500;
+            border-radius: 3px 3px 0px 0px;
+            cursor: pointer;
+        }
+        #control .btnn{    
+        }
+        #control:hover{
+            padding: 2px 3px;
+            transform:translateY(-20px);
+            -webkit-transform:translateY(-20px);
         }
         .loading {
             width: 3px; height:3px;
@@ -65,9 +111,17 @@
         }
         .spin {
             transform: rotate(360deg);
-            animation: spin 1s linear infinite;
             -webkit-transform: rotate(360deg);
+            animation: spin 1s linear infinite;
             -webkit-animation: spin 1s linear infinite; 
+        }
+        .popUp{
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            transform: scale(0.4);
+            -webkit-transform: scale(0.4);
+            animation: popUp .8s ease-in forwards;
+            -webkit-animation: popUp .8s ease-in forwards;
         }
         @keyframes spin {
             from {transform: rotate(0deg);}
@@ -76,6 +130,22 @@
         @-webkit-keyframes spin {
             from {-webkit-transform: rotate(0deg);}
               to {-webkit-transform: rotate(360deg);}
+        }
+        @keyframes fadeIn {
+            0%   { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @-webkit-keyframes fadeIn {
+            0%   { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes popUp {
+            0% { }
+            100% { -webkit-transform: scale(1); transform: scale(1); opacity: 1; animation-timing-function: ease-out;}
+        }
+        @-webkit-keyframes popUp {
+            0% { }
+            100% { -webkit-transform: scale(1); opacity: 1; -webkit-animation-timing-function: ease-out}
         }
     </style>
     <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
@@ -87,19 +157,33 @@
     <h2><a href="{{ url }}">{{ title }}</a><small>共{{ count }}张<a href="{{url_for('albums')}}" class="glyphicon glyphicon-off" aria-hidden="true"> </a></small></h2>
     <p>
     download: <a href="{{url_for('getalbum')}}?url={{ url }}">txt</a>|<a href="{{url_for('zip')}}?url={{ url }}">zip</a>
+    <button id="fullscreen" class="btn btn-default">全屏浏览 <span class="glyphicon glyphicon-fullscreen"></span></button>
+    <p class="">
+        点击图片大图浏览，鼠标单击下一张双击上一张，左右方向键翻页，ESC退出。
+    </p>
     </p>
     <div class="grid">
     {%- for img in imgs %}
-        <div class="grid-item"><img src="{{ img }}"></div>
+        <div class="grid-item">
+            <a name="{{ loop.index }}"><img src="{{ img }}"></a>
+        </div>
     {% endfor -%}
     </div>
 </div>
 <div class="overlay"></div>
 <div class="previewBox">
     <div class="mask-content">
-        <img src="">        
+        <img src="">
+        <p class="tips head alert alert-info animate">到头了！</p>
+        <p class="tips end alert alert-info animate">到底了！</p>        
     </div>
     <div class="mask-load"><p class="loading spin"></p></div>
+    <div id="control">
+        <span class="info">
+            <span class="current">0</span>/<span class="count">{{ count }}</span>
+        </span>|<span class="exit btnn">退出浏览</span>
+        <!-- |<span id="fullscreen">全屏</span>    -->
+    </div>
 </div>
 {% endblock body %}
 {% block script %}
@@ -115,85 +199,144 @@
     $grid.imagesLoaded().progress( function( instance, image) {
       $grid.masonry('layout');
       image.isLoaded ? 'loaded' : console.log( 'image is ' + result + ' for ' + image.img.src );
-      
     });
     // single img showbox
     var currentNode;//img node
     var f = false;//previewBox yes or no
-    var mask = $(".overlay");
-    var box = $(".previewBox");
-    var vc = $(".mask-content")
-    var viewimg = $(".previewBox .mask-content img");
-    var loader = $('.mask-load')
-    $(".grid-item").on("click",function(){
-        showIMG();
-        getIMG(this);
-    });
+    var overlay = document.querySelector('.overlay');
+    var previewBox = document.querySelector('.previewBox');
+    var maskContent = document.querySelector('.mask-content');
+    var viewimg = document.querySelector('.previewBox .mask-content img');
+    var loader = document.querySelector('.mask-load');
+    $(".grid-item").on("click", view);
     $(document).keydown(function(e){
         // console.log(e.keyCode);
         if(f){
-            if(e.keyCode==37){
+            if(e.keyCode==37)
                 prevImg();
-            }
-            else if(e.keyCode==39){
+            else if (e.keyCode==39)
                 nextImg();
-            }
+            else if (e.keyCode==27)
+                closeBox();
         }
     })
     $(window).resize( size );
-    box.click(closeBox);
-    viewimg.click(function(){
-        event.stopPropagation();
-        nextImg();
+    $(previewBox).mousedown(function(e){
+        // console.log('box.mousedown',e.button);
+        e.stopPropagation();
+        e.preventDefault();
+        e.button==0 ? closeBox():0;
     });
+    $(viewimg).mousedown(function(e){
+        // console.log('viewimg.mousedown',e.button);
+        e.stopPropagation();
+        e.preventDefault();
+        if (e.button==0)
+            nextImg();
+        if (e.button==2)
+            prevImg();
+    });
+    // $(maskContent).on('contextmenu',function(e){console.log(e);return false;});
+    previewBox.addEventListener('contextmenu', function(e){
+        e = e || window.event;
+        e.preventDefault();
+        console.log('previewBox contnetmenu',e);
+    }, false);
+    function view(node){
+        var that = this;
+        if (typeof node == 'string' || typeof node == 'number')
+            that = $(".grid-item")[parseInt(node)-1];
+        showIMG();
+        getIMG( that, $(that).next()[0]);
+        // console.log('that',this);
+    }
     function size(){
-        viewimg.css('max-height',box.height());
-        viewimg.css('max-width',box.width());
-        var h = vc.height()/2;
-        vc.css('margin-top',-h);
+        $(viewimg).css('max-height',$(previewBox).height());
+        $(viewimg).css('max-width',$(previewBox).width());
+        var h = $(maskContent).height()/2;
+        $(maskContent).css('margin-top',-h);
     };
     function getIMG(node, preload){
-        loader.show();
-        viewimg.hide();
+        $(viewimg).hide();
+        $(loader).show();
         currentNode = node;
         var img = node.querySelector('img');
         var src = img.src.replace(/small\./,'big.');
-        viewimg.attr("src",src);
-        viewimg.imagesLoaded()
+        $(viewimg).attr("src",src);
+        $(viewimg).imagesLoaded()
         .always(function(){
-            viewimg.show();
-            loader.hide();
+            $(viewimg).show();
+            $(loader).hide();
             size();
         })
         .progress(function(){
-            // pre-load img
-            preload ? (function(){
+            preload ? (function(){// pre-load img
                 var preimg = new Image();
                 preimg.src = preload.querySelector('img').src.replace(/small\./,'big.');
-            })() : 1
+            })() : 0;
         });
+        $('#control .current').text(currentNode.querySelector('a').name);
+        location.hash = currentNode.querySelector('a').name;
     };
     function prevImg(){
-        var n;
-        (n = $(currentNode).prev()[0]) ? getIMG(n, $(n).prev()[0]) : console.log('to head');
+        var n= $(currentNode).prev()[0];
+        if(n){
+            getIMG(n, $(n).prev()[0]);
+            $('.mask-content>.end').hide();
+        }else{
+            $('.mask-content>.head').show();
+        };
     }
     function nextImg(){
-        var n;
-        (n = $(currentNode).next()[0]) ? getIMG(n, $(n).next()[0]) : console.log('to end');
-    }; 
+        var n= $(currentNode).next()[0];
+        if(n){
+            getIMG(n, $(n).next()[0]);
+            $('.mask-content>.head').hide();
+        }else{
+            $('.mask-content>.end').show();
+        };
+    };
     function showIMG(){
-        mask.show();
-        box.show();
+        $(overlay).show();
+        $(previewBox).show();
         f = !f;
         $('body').css('overflow','hidden');
     }
     function closeBox(){
-        mask.hide();
-        box.hide();
-        viewimg.attr("src","");
         f = !f;
-        $('body').css('overflow','')
+        $(overlay).hide();
+        $(previewBox).hide();
+        $(viewimg).attr("src","");
+        $(viewimg).removeAttr("style");
+        $(maskContent).removeAttr("style");
+        $('body').css('overflow','');
+        $('.mask-content>.end').hide();
+        $('.mask-content>.head').hide()
+        // location.hash = currentNode.querySelector('a').name;
     }
+    // toolbar
+    // $('#control .exit').click(closeBox);
+    // full screen
+    function launchFullscreen(element) {
+      if(element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if(element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if(element.msRequestFullscreen){
+        element.msRequestFullscreen();
+      } else if(element.webkitRequestFullscreen) {
+        element.webkitRequestFullScreen();
+      }
+    }
+    $('#fullscreen').click(function(){
+        view(1);
+        launchFullscreen(previewBox);
+    })
+    $(document).ready(function(){
+        var imgid = location.hash.split('#')[1];
+        if(imgid)
+            view(imgid);
+    })
 </script>
 {% endblock script %}
 </body>
