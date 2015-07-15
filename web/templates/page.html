@@ -1,52 +1,86 @@
-<!-- <html xmlns:wb="http://open.weibo.com/wb"> -->
 {% extends "base.html" %}
-{% block title%}虎扑相册图片抓取器{% endblock title%}
+{% block title%}{{ Banner|default('历史记录') }}{% endblock title%}
 {% block head -%}
 {{ super() }}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-    <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
-    <script src="/static/main.js"></script>
-    <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
+    <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        body{
+            font-size: 13px;
+            color: #545454;
+        }
+        p, ul, ol, li{ margin: 0;padding: 0;}
+        a { text-decoration: none;color: #464646;cursor: pointer;padding: 2px}
+        a:hover{ text-decoration: none;}
+        ul {list-style: none;}
+
+        .title {padding: 2px;}
+        .album_list img { box-shadow: 2px 2px 5px #ccc; padding: 2px;}
+        .album_list img:hover{color: #fff;background-color: #7ad;}
+        .album_list li{
+            display: inline-block;
+            padding: 5px 5px 0 5px;
+            line-height: 18px;
+            height: 281px!important;
+            height: 291px;
+            width: 144px;
+            overflow: hidden;
+        }
+        .pagination>li>a{
+            padding: 2px 7px;
+            border: #CCCCCC 1px solid;
+            margin: 0 3px;
+            font-family: Tahoma;
+            color: #444;
+        }
+        .pagination .active a,
+        .pagination .active a:hover{
+            background: #95071B;
+            border-color: #95071B;
+        }
+        .pagination>li>a:hover{
+            background: #95071B;
+            border-color: #95071B;
+            color: #fff;
+        }
+        .pagination .disabled span{
+            border: 0;
+        }
+        .pagination .disabled span:hover{
+            cursor: default;
+        }
+    </style>
 {%- endblock head %}
-{% block body %}
-    <div id="main">
-        {% block userinfo %}{% endblock userinfo %}
-        <!-- content -->
-        <div id="wrap">
-            <header>相册图片抓取器</header>
-            <div id="console">
-                {% block label %}{% endblock label %}
-                <button id="crawl" class="btn">抓取</button>
-                <div id="load">
-                    <p class="loading spin"></p>
-                    <p>正在抓取，请稍等～～</p>
-                </div>
-                {% block tips %}{% endblock tips %}
-            </div>
-            <div id="data" class="left">
-                <form>
-                    <p>
-                        <input type=button value="全选" onClick="javascript:this.form.text.focus();this.form.text.select();"><span>Ctrl + c 复制下来,用下载工具下载</span>
-                    </p>
-                    <textarea id="output" class="urltext" name="text" rows="23" cols="65" readonly="readonly"></textarea>
-                </form>
-            </div>
-            <div id="albuminfo" class="right">
-                <p>相册信息:</p>
-                <article>
-                    <img src="" id="albumcover">
-                    <p id="albumtitle"></p>
-                    <p id="albumpics"></p>
-                </article>
-                <div id="sharetab" style="display: none;">
-                    <wb:share-button appkey="4109392084" addition="number" type="button" language="zh_cn"></wb:share-button>
-                </div>
-            </div>
-        </div>
-        {% block nav %}{% endblock nav %}
+{%- block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>{{ Banner|default('历史记录') }} <small><a href="{{url_for('index')}}"> 回首页</a></small></h1>
     </div>
+    {% block nav %}{% endblock nav%}
+    <ul class="album_list">
+        {% for album in albums -%}
+            <li>
+                <a href="{{url_for('preview')}}?url={{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
+                <p class="title">
+                <a href="{{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
+                </p>
+                <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
+            </li>
+        {% else %}
+            <em>怎么会没有呢？</em>
+        {%- endfor %}
+    </ul>
     <footer>
-    如果本工具对您有帮助，希望您能够<a  class="a" href="{{ url_for('donate') }}">捐助</a>此工具| Last updated <span id="lastDate">{{ lastDate }}</span> | <a class="a" href="mailto:xavierskip@gmail.com?Subject=BUG:" target="_blank">反馈</a>
+        <ul class="pagination">
+            {%- for p in pages %}
+                {% if not p -%}
+                    <li class="disabled"><span aria-hidden="true">...</span></a></li>
+                {%- elif p == currentpage -%}
+                    <li class="active" ><a href="{{url_for( func )}}?page={{p}}">{{p}}<span class="sr-only">(current)</span></a></li>
+                {%- else -%}
+                    <li><a href="{{url_for( func )}}?page={{p}}">{{p}}</a></li>
+                {%- endif -%}
+            {%- endfor %}
+        </ul>
     </footer>
-{% block popup %}{% endblock popup %}
-{% endblock body %}
+</div>
+{% endblock body -%}

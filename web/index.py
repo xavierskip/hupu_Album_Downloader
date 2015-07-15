@@ -76,7 +76,7 @@ def index():
                 'name': f.get('name'),
                 'avatar': f.get('avatar')
             }
-            return render_template('login.html',user=user,lastDate=LASTDATE)
+            return render_template('advance.html',user=user,lastDate=LASTDATE)
     else:
         return render_template('home.html',lastDate=LASTDATE)
 
@@ -192,7 +192,7 @@ def albums():
     g.cur.execute('''SELECT count(*) from `albums`''')
     pagenums = int(ceil(int(g.cur.fetchone().get('count(*)'))/imgs))
     pages = pagination(currentpage, pagenums, 2)
-    return render_template('history.html', albums=albums, pages=pages, currentpage=currentpage, func=sys._getframe().f_code.co_name)
+    return render_template('albums.html', albums=albums, pages=pages, currentpage=currentpage, func=sys._getframe().f_code.co_name)
     # return "<h1>UNDER CONSTRUCTION!</h1>"
 
 @app.route('/SD/')
@@ -236,7 +236,7 @@ def sd():
     albums = sorted(albums, key = lambda a: albums_url.index(a.get('url')) )
     pagenums = int(ceil(len(albums_url)/imgs))
     pages = pagination(currentpage, pagenums, 2)
-    return render_template('albums.html', albums=albums, pages=pages, currentpage=currentpage, Banner=u'灌篮高手', func=sys._getframe().f_code.co_name)
+    return render_template('page.html', albums=albums, pages=pages, currentpage=currentpage, Banner=u'灌篮高手', func=sys._getframe().f_code.co_name)
 
 @app.route('/preview/')
 def preview():
