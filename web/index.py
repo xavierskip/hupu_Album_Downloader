@@ -65,22 +65,8 @@ def teardown_request(exception):
     if hasattr(g,'db'):
         g.db.close()
 
-@app.route('/')
-def index():
-    uid = session.get('uid')
-    if uid:
-        g.cur.execute("""SELECT `name`,`avatar`  FROM `users` WHERE `uid` = %s""",(uid,))
-        f = g.cur.fetchone()
-        if f:
-            user = {
-                'name': f.get('name'),
-                'avatar': f.get('avatar')
-            }
-            return render_template('advance.html',user=user,lastDate=LASTDATE)
-    else:
-        return render_template('home.html',lastDate=LASTDATE)
-
-@app.route('/getalbum',methods=['POST'])
+# method
+@app.route('/getalbum', methods=['POST'])
 def get():
     start = time.time()
     url = request.form['url']
@@ -123,8 +109,64 @@ def get():
         get_pics = album.get_pics,
         pics_urls = album.pics_urls,
         time = time.time()-start
-    )    
+    )
 
+@app.route('/getalbum', methods=['GET'])
+def getalbum():
+    url = request.args.get('url')
+    if url:
+        g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''',(url,))
+        r = g.cur.fetchone()
+        if r:
+            # return Response(r.get('picsUrls'),mimetype='text/pain')
+            title = r.get('title').encode('utf-8')
+            # print title.decode('utf-8'),type(title)
+            return Response(r.get('picsUrls'),
+                headers = {
+                    'Content-Type': 'text/pain; charset=utf-8',
+                    'Content-Disposition': 'attachment; filename="%s.txt"' %title
+                })
+        else:
+            return 'don\'t found!'
+    else:
+        return abort(400)
+
+@app.route('/zip', methods=['GET'])
+def zip():
+    '''
+    need nginx module mod_zip  https://github.com/evanmiller/mod_zip
+    '''
+    url = request.args.get('url')
+    if url:
+        g.cur.execute(''' SELECT `title`,`picsUrls` FROM `albums` WHERE `url` = %s''',(url,))
+        r = g.cur.fetchone()
+        if r:
+            title = r.get('title').encode('utf-8')
+            files = r.get('picsUrls').split('\n')
+            fileList = []
+            for f in files:
+                name = f.split('/')[-1]
+                # url = 'http://t.vm'+url_for('static', filename=f)
+                path = '/img/'+re.split('/',f,3)[-1]
+                resp = requests.head(f)
+                size = resp.headers.get('content-length')
+                fileList.append(' '.join(['-',size,path,name]))
+            fs = "\n".join(fileList)
+            # print fs
+            return Response(fs,
+                    headers={
+                        'X-Archive-Files': 'zip',
+                        'Content-Disposition': 'attachment; filename="%s.zip"' %title
+                    }
+                )
+        else:
+            return abort(404)
+    else:
+        return abort(400)
+
+    # return "zip"  
+
+# weibo registry
 @app.route('/oauth')
 def oauth():
     authorize = 'https://api.weibo.com/oauth2/authorize?client_id=%s&response_type=code&redirect_uri=%s' \
@@ -175,6 +217,22 @@ def logout():
     session['uid'] = ''
     return redirect(url_for('index'))
 
+# views 
+@app.route('/')
+def index():
+    uid = session.get('uid')
+    if uid:
+        g.cur.execute("""SELECT `name`,`avatar`  FROM `users` WHERE `uid` = %s""",(uid,))
+        f = g.cur.fetchone()
+        if f:
+            user = {
+                'name': f.get('name'),
+                'avatar': f.get('avatar')
+            }
+            return render_template('advance.html',user=user,lastDate=LASTDATE)
+    else:
+        return render_template('home.html',lastDate=LASTDATE)
+
 @app.route('/albums/')
 def albums():
     imgs = 60.0# how much img in one page , float num
@@ -187,13 +245,11 @@ def albums():
     g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(imgstart,imgstep))
     albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
                 for row in g.cur.fetchall() ]
-    # pages = dict(current=page,number=pn)
     # pagination
     g.cur.execute('''SELECT count(*) from `albums`''')
     pagenums = int(ceil(int(g.cur.fetchone().get('count(*)'))/imgs))
     pages = pagination(currentpage, pagenums, 2)
     return render_template('albums.html', albums=albums, pages=pages, currentpage=currentpage, func=sys._getframe().f_code.co_name)
-    # return "<h1>UNDER CONSTRUCTION!</h1>"
 
 @app.route('/SD/')
 def sd():
@@ -263,61 +319,6 @@ def preview():
             return 'don\'t found!'
     else:
         return abort(400)
-
-@app.route('/getalbum')
-def getalbum():
-    url = request.args.get('url')
-    if url:
-        g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''',(url,))
-        r = g.cur.fetchone()
-        if r:
-            # return Response(r.get('picsUrls'),mimetype='text/pain')
-            title = r.get('title').encode('utf-8')
-            # print title.decode('utf-8'),type(title)
-            return Response(r.get('picsUrls'),
-                headers = {
-                    'Content-Type': 'text/pain; charset=utf-8',
-                    'Content-Disposition': 'attachment; filename="%s.txt"' %title
-                })
-        else:
-            return 'don\'t found!'
-    else:
-        return abort(400)
-
-@app.route('/zip')
-def zip():
-    '''
-    need nginx module mod_zip  https://github.com/evanmiller/mod_zip
-    '''
-    url = request.args.get('url')
-    if url:
-        g.cur.execute(''' SELECT `title`,`picsUrls` FROM `albums` WHERE `url` = %s''',(url,))
-        r = g.cur.fetchone()
-        if r:
-            title = r.get('title').encode('utf-8')
-            files = r.get('picsUrls').split('\n')
-            fileList = []
-            for f in files:
-                name = f.split('/')[-1]
-                # url = 'http://t.vm'+url_for('static', filename=f)
-                path = '/img/'+re.split('/',f,3)[-1]
-                resp = requests.head(f)
-                size = resp.headers.get('content-length')
-                fileList.append(' '.join(['-',size,path,name]))
-            fs = "\n".join(fileList)
-            # print fs
-            return Response(fs,
-                    headers={
-                        'X-Archive-Files': 'zip',
-                        'Content-Disposition': 'attachment; filename="%s.zip"' %title
-                    }
-                )
-        else:
-            return abort(404)
-    else:
-        return abort(400)
-
-    # return "zip"
 
 @app.route('/donate/')
 def donate():
