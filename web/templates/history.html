@@ -1,0 +1,25 @@
+{% extends "albums.html" %}
+{% block head -%}
+{{ super() }}
+<script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+<script src="//cdn.bootcss.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+{%- endblock head %}
+{% block nav %}
+<nav class="navbar navbar-default">
+    <div class="navbar-header">
+        <button class="navbar-toggle" data-toggle="collapse" data-target="#navbar1">
+            <i class="icon-bar"></i>
+            <i class="icon-bar"></i>
+            <i class="icon-bar"></i>
+        </button>
+        <a class="navbar-brand">主题：</a>
+    </div>
+    <div id="navbar1" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="{{ url_for('sd') }}">灌篮高手</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock nav%}
