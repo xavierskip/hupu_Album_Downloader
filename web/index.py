@@ -34,12 +34,12 @@ def img_base64(img,ext):
 
 def pagination(currentpage, pagenums, ripple):
     rangeStart, rangeEnd = currentpage-ripple,currentpage+ripple
-    if rangeStart < 1 and rangeEnd > pagenums:
+    if rangeStart <= 1+1 and rangeEnd >= pagenums-1:
         pages = [ i for i in range(1,pagenums+1)]
-    elif rangeStart <= 1+1:
+    elif rangeStart <=1+1 and  rangeEnd < pagenums-1:
         pages = [ i for i in range(1,rangeEnd+1)]
         pages.extend(['',pagenums])
-    elif rangeEnd >= pagenums-1:
+    elif rangeStart > 1+1 and rangeEnd >= pagenums-1:
         pages = [1,'']
         pages.extend([ i for i in range(rangeStart,pagenums+1)])
     else:
@@ -233,32 +233,39 @@ def index():
     else:
         return render_template('home.html',lastDate=LASTDATE)
 
+def selectLIMIT(request):
+    imgInOnepage = 60.0# how much img in one page , float num
+    try:
+        current  = int(request.args.get('page'))-1
+        if current < 0:
+            raise TypeError
+    except TypeError as e:
+        current = 0 # currentpage start by 0
+    return current,int( current*imgInOnepage ),int(imgInOnepage)
+
+def selectUrls(urls, offset, row_count):
+    stmt = ''' SELECT url,title,cover,pics,getPics,times FROM albums WHERE url IN (%s) '''\
+        %(','.join(['%s' for i in range(len(urls))])) + 'LIMIT %s,%s' %(offset, row_count)
+    g.cur.execute( stmt,urls)
+    return [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
+                for row in g.cur.fetchall() ]
+
+
 @app.route('/albums/')
 def albums():
-    imgs = 60.0# how much img in one page , float num
-    try:
-        currentpage = abs(int(request.args.get('page')))
-    except TypeError as e:
-        currentpage = 1
-    imgstart,imgstep = int((currentpage-1)*imgs),int(imgs)
-    # get albums info
-    g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(imgstart,imgstep))
+    currentpage, offset, row_count = selectLIMIT(request)
+    g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(offset, row_count))
     albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
                 for row in g.cur.fetchall() ]
-    # pagination
     g.cur.execute('''SELECT count(*) from `albums`''')
-    pagenums = int(ceil(int(g.cur.fetchone().get('count(*)'))/imgs))
-    pages = pagination(currentpage, pagenums, 2)
-    return render_template('albums.html', albums=albums, pages=pages, currentpage=currentpage, func=sys._getframe().f_code.co_name)
+    pagenums = int( ceil( int( g.cur.fetchone().get('count(*)') ) / float(row_count) ))
+    nav = pagination(currentpage, pagenums, 2) # pagination
+    return render_template('albums.html', albums=albums, nav=nav, currentpage=currentpage+1, func=sys._getframe().f_code.co_name)
 
 @app.route('/SD/')
 def sd():
-    imgs = 60.0# how much img in one page , float num
-    try:
-        currentpage = abs(int(request.args.get('page')))
-    except TypeError as e:
-        currentpage = 1
-    albums_url = [
+    currentpage, offset, row_count = selectLIMIT(request)
+    album_urls = [
         'http://my.hupu.com/3616496/photo/a75782.html',
         'http://my.hupu.com/3616496/photo/a1820422.html',
         'http://my.hupu.com/3616496/photo/a1818729.html',
@@ -284,19 +291,45 @@ def sd():
         'http://my.hupu.com/3616496/photo/a1766130.html',
         'http://my.hupu.com/3616496/photo/a1806265.html'
     ]
-    stmt = ''' SELECT url,title,cover,pics,getPics,times FROM albums WHERE url IN (%s)''' \
-        %(','.join(['%s' for i in range(len(albums_url))]))
-    g.cur.execute( stmt,albums_url)
-    albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
-                for row in g.cur.fetchall() ]
-    albums = sorted(albums, key = lambda a: albums_url.index(a.get('url')) )
-    pagenums = int(ceil(len(albums_url)/imgs))
-    pages = pagination(currentpage, pagenums, 2)
-    return render_template('page.html', albums=albums, pages=pages, currentpage=currentpage, Banner=u'灌篮高手', func=sys._getframe().f_code.co_name)
+    albums = selectUrls(album_urls, offset, row_count)
+    albums = sorted(albums, key = lambda a: album_urls.index(a.get('url')) )
+    pagenums = int( ceil( len(album_urls)/row_count ))
+    nav = pagination(currentpage, pagenums, 2)
+    return render_template('page.html', albums=albums, nav=nav, currentpage=currentpage+1, Banner=u'灌篮高手', func=sys._getframe().f_code.co_name)
+
+@app.route('/MM/')
+def mm():
+    currentpage, offset, row_count = selectLIMIT(request)
+    album_urls = [
+        'http://my.hupu.com/16355386/photo/a211504.html',
+        'http://my.hupu.com/sunyatsen/photo/a135716.html',
+        'http://my.hupu.com/MasamiSaiko/photo/a1815728.html',
+        'http://my.hupu.com/MasamiSaiko/photo/a1807616.html'
+    ]
+    albums = selectUrls(album_urls, offset, row_count)
+    pagenums = int( ceil( len(album_urls)/row_count ))
+    nav = pagination(currentpage, pagenums, 2)
+    return render_template('page.html', albums=albums, nav=nav, currentpage=currentpage+1, Banner=u'姑娘', func=sys._getframe().f_code.co_name)
+
+@app.route('/MJ/')
+def mj():
+    currentpage, offset, row_count = selectLIMIT(request)
+    album_urls = [
+        'http://my.hupu.com/329273/photo/a1777785.html',
+        'http://my.hupu.com/14556892/photo/a1788576.html',
+        'http://my.hupu.com/hoopchinalv/photo/a65885.html',
+        'http://my.hupu.com/16746798/photo/a1808304.html',
+        'http://my.hupu.com/healmyself24/photo/a107614.html',
+        'http://my.hupu.com/3862090/photo/a131620.html'
+    ]
+    albums = selectUrls(album_urls, offset, row_count)
+    pagenums = int( ceil( len(album_urls)/row_count ))
+    nav = pagination(currentpage, pagenums, 2)
+    return render_template('page.html', albums=albums, nav=nav, currentpage=currentpage+1, Banner='Michael Jordan', func=sys._getframe().f_code.co_name)
+
 
 @app.route('/preview/')
 def preview():
-    count = 60
     url = request.args.get('url')
     try:
         page = abs(int(request.args.get('p')))

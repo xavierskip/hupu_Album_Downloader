@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title%}{{ Banner|default('历史记录') }}{% endblock title%}
+{% block title%}{{ Banner|default('相册记录') }}{% endblock title%}
 {% block head -%}
 {{ super() }}
     <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
@@ -60,33 +60,35 @@
 {%- block body %}
 <div class="container">
     <div class="page-header">
-        <h1>{{ Banner|default('历史记录') }} <small><a href="{{url_for('index')}}"> 回首页</a></small></h1>
+        <h1>{{ Banner|default('相册记录') }} <small><a href="{{url_for('index')}}"> 回首页</a></small></h1>
     </div>
     {% block nav %}{% endblock nav%}
     <ul class="album_list">
-        {% for album in albums -%}
-            <li>
-                <a href="{{url_for('preview')}}?url={{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
-                <p class="title">
-                <a href="{{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
-                </p>
-                <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
-            </li>
-        {% else %}
-            <em>怎么会没有呢？</em>
-        {%- endfor %}
+    {% for album in albums -%}
+        <li>
+            <a href="{{url_for('preview')}}?url={{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
+            <p class="title">
+            <a href="{{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
+            </p>
+            <p>抓取到{{album.getPics}}张┊{{album.times}}次</p>
+        </li>
+    {% else %}
+        <em>怎么会没有呢？</em>
+    {%- endfor %}
     </ul>
     <footer>
         <ul class="pagination">
-            {%- for p in pages %}
-                {% if not p -%}
-                    <li class="disabled"><span aria-hidden="true">...</span></a></li>
-                {%- elif p == currentpage -%}
-                    <li class="active" ><a href="{{url_for( func )}}?page={{p}}">{{p}}<span class="sr-only">(current)</span></a></li>
-                {%- else -%}
-                    <li><a href="{{url_for( func )}}?page={{p}}">{{p}}</a></li>
-                {%- endif -%}
-            {%- endfor %}
+        {%- if nav|length > 1 -%}
+        {%- for n in nav %}
+            {% if not n -%}
+            <li class="disabled"><span aria-hidden="true">...</span></a></li>
+            {%- elif n == currentpage -%}
+            <li class="active" ><a href="{{url_for( func )}}?page={{n}}">{{n}}<span class="sr-only">(current)</span></a></li>
+            {%- else -%}
+            <li><a href="{{url_for( func )}}?page={{n}}">{{n}}</a></li>
+            {%- endif -%}
+        {%- endfor %}
+        {%- endif %}
         </ul>
     </footer>
 </div>
