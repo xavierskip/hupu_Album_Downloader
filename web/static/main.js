@@ -75,10 +75,10 @@ $("[href='#login-model']").click(function(){
     }
 });
 // last update
-$.ajax({
-    url:'https://api.github.com/repos/xavierskip/hupu_Album_Downloader'
-}).done(function(b){
-    $("#lastDate").text(b["pushed_at"].split('T')[0]);
-});
+// $.ajax({
+//     url:'https://api.github.com/repos/xavierskip/hupu_Album_Downloader'
+// }).done(function(b){
+//     $("#lastDate").text(b["pushed_at"].split('T')[0]);
+// });
 
 });

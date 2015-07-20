@@ -22,7 +22,6 @@ APPKEY = app.config.get('APPKEY')
 APPSECRET = app.config.get('APPSECRET')
 REDIRECTURI = app.config.get('REDIRECTURI')
 # VAR
-LASTDATE = app.config.get('LASTDATE')
 LUSER = app.config.get('LUSER')
 LPWD = app.config.get('LPWD')
 # set secret_key
@@ -229,9 +228,9 @@ def index():
                 'name': f.get('name'),
                 'avatar': f.get('avatar')
             }
-            return render_template('advance.html',user=user,lastDate=LASTDATE)
+            return render_template('advance.html',user=user)
     else:
-        return render_template('home.html',lastDate=LASTDATE)
+        return render_template('home.html')
 
 def selectLIMIT(request):
     imgInOnepage = 60.0# how much img in one page , float num
