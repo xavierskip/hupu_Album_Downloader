@@ -90,10 +90,10 @@ def get():
     coverimg='' # album.cover img to base64
     if album.state==1:
         # return cover img with base 64 and store data
-        # cover = album.session.get(album.cover).content
-        # ext = album.cover.split('.')[-1]
-        # coverimg = img_base64(cover,ext)
-        coverimg = album.cover
+        cover = album.session.get(album.cover).content
+        ext = album.cover.split('.')[-1]
+        coverimg = img_base64(cover,ext)
+        # coverimg = album.cover
         g.cur.execute(''' INSERT INTO  `albums` (`url`,`title`,`cover`,`pics`,`getPics`,`picsUrls`) VALUES (%s,%s,%s,%s,%s,%s)\
             ON DUPLICATE KEY UPDATE `title`=%s,`cover`=%s,`pics`=%s,`getPics`=%s,`picsUrls`=%s,`times`=`times`+1 ''',
             (album.homepage,album.title,coverimg,album.pics,album.get_pics,album.pics_urls,
