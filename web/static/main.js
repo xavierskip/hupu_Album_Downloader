@@ -1,3 +1,9 @@
+function setCookie(c_name,value,expiredays){
+    var exdate=new Date();
+    exdate.setDate(exdate.getDate()+expiredays);
+    document.cookie=c_name+ "=" +escape(value)+
+    ((expiredays==null) ? "" : ";expires="+exdate.toGMTString());
+}
 String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); };
 
 $(document).ready(function(){
@@ -21,7 +27,9 @@ function draw(response){
         $('#albumtitle').html('《'+response.title+'》'+'有'+response.pics+'张图片');
         $('#albumpics').html('抓取出'+response.get_pics+'张图片');
         share.show();
-        title.text('《'+response.title+'》'+response.homepage+'中有'+response.get_pics+'张图片。抓取工具:'+location.href)
+        title.text('《'+response.title+'》'+response.homepage+'中有'+response.get_pics+'张图片。抓取工具:'+location.href);
+        setCookie('u',response.homepage);
+        setCookie('t',response.title);
     }else{
         output.value = states[response.state];
     }    

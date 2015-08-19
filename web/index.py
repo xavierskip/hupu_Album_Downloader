@@ -8,6 +8,8 @@ from hupu import detect_album_path
 #
 from datetime import timedelta
 from math import ceil
+from urllib import unquote
+import codecs
 import os,base64,json
 import requests
 import time
@@ -356,6 +358,26 @@ def preview():
 def donate():
     return render_template('donate.html')
 
+@app.route('/csrf/')
+def csrf():
+    csrf = int(request.cookies.get('csrf','0'))
+    if not csrf:
+        t = request.cookies.get('t','')
+        u = request.cookies.get('u','')
+        html = render_template('csrf.html',
+                title = unquote(codecs.decode(t.replace("%u","\\u"), 'unicode_escape')),
+                url = unquote(codecs.decode(u.replace("%u","\\u"), 'unicode_escape'))
+            )
+        # raise KeyError
+        response = make_response(html.encode('gb2312'))
+        response.content_type = "text/html;charset=gb2312"
+        response.set_cookie('csrf','1')
+        return response
+    else:
+        response = make_response(redirect(url_for('albums')))
+        response.set_cookie('csrf','0')
+        return response
+    # return render_template('csrf.html')
 # @app.route('/debug')
 # def debug():
 #     raise KeyError

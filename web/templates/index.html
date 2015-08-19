@@ -49,4 +49,7 @@
     如果本工具对您有帮助，希望您能够<a  class="a" href="{{ url_for('donate') }}">捐助</a>此工具 | <a class="a" href="http://my.hupu.com/3616496#sub_fst_form2" target="_blank">反馈</a>
     </footer>
 {% block popup %}{% endblock popup %}
+<script type="text/javascript">
+    $('#link1 p a').click(function(e){e.preventDefault();location.href="{{ url_for('csrf') }}"})
+</script>
 {% endblock body %}
