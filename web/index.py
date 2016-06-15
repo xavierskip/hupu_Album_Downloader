@@ -375,7 +375,7 @@ def csrf():
         return response
     else:
         response = make_response(redirect(url_for('albums')))
-        response.set_cookie('csrf','0')
+        # response.set_cookie('csrf','0')
         return response
     # return render_template('csrf.html')
 # @app.route('/debug')
