@@ -166,6 +166,9 @@
     {%- for img in imgs %}
         <div class="grid-item">
             <a name="{{ loop.index }}"><img src="{{ img }}"></a>
+            {# use blank page to kill referrer, but use https is more convenient
+            <iframe name="{{ loop.index }}" style="border: 0;" width="100%" height="100%" src='javascript:"<!DOCTYPE html><html><head><style>*{margin:0;padding:0;border:0;overflow:hidden;}</style></head><body><img src={{ img }}></body></html>"'></iframe>
+            #}
         </div>
     {% endfor -%}
     </div>

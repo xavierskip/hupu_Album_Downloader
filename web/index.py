@@ -91,11 +91,12 @@ def get():
     album.save()
     coverimg='' # album.cover img to base64
     if album.state==1:
-        # return cover img with base 64 and store data
-        cover = album.session.get(album.cover).content
-        ext = album.cover.split('.')[-1]
-        coverimg = img_base64(cover,ext)
-        # coverimg = album.cover
+        # store cover img with base 64
+        # cover = album.session.get(album.cover).content
+        # ext = album.cover.split('.')[-1]
+        # coverimg = img_base64(cover,ext)
+        # store cover img with url
+        coverimg = album.cover
         g.cur.execute(''' INSERT INTO  `albums` (`url`,`title`,`cover`,`pics`,`getPics`,`picsUrls`) VALUES (%s,%s,%s,%s,%s,%s)\
             ON DUPLICATE KEY UPDATE `title`=%s,`cover`=%s,`pics`=%s,`getPics`=%s,`picsUrls`=%s,`times`=`times`+1 ''',
             (album.homepage,album.title,coverimg,album.pics,album.get_pics,album.pics_urls,
@@ -342,7 +343,8 @@ def preview():
         r = g.cur.fetchone()
         if r:
             count = r.get('pics')
-            thumbnails = re.sub( 'big.', 'small.', r.get('picsUrls')).split('\n')#[0:20]
+            urls = r.get('picsUrls')
+            thumbnails = re.sub('big.', 'small.', urls).split('\n')#[0:20]
             return render_template('preview.html',
                     title = r.get('title'),
                     imgs = thumbnails,
