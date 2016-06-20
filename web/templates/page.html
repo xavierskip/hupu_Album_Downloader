@@ -85,7 +85,7 @@
             {% if not n -%}
             <li class="disabled"><span aria-hidden="true">...</span></a></li>
             {%- elif n == currentpage -%}
-            <li class="active" ><a href="{{url_for( func )}}?page={{n}}">{{n}}<span class="sr-only">(current)</span></a></li>
+            <li class="active" ><a href="{{url_for( func )}}?page={{n}}{% if ooxx %}&ooxx=1{% endif %}">{{n}}<span class="sr-only">(current)</span></a></li>
             {%- else -%}
             <li><a href="{{url_for( func )}}?page={{n}}">{{n}}</a></li>
             {%- endif -%}
