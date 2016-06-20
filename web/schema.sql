@@ -12,6 +12,7 @@ CREATE TABLE `albums` (
   `picsUrls` mediumtext NOT NULL,
   `times` int(11) NOT NULL DEFAULT '1',
   `logTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `ooxx` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `url` (`url`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

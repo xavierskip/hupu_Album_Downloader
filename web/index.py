@@ -379,7 +379,7 @@ def preview():
         page = abs(int(request.args.get('p')))
     except TypeError as e:
         page = 0
-    print 'page',page
+    # print 'page',page
     if url:
         g.cur.execute(''' SELECT `picsUrls`,`title`,`pics` FROM `albums` WHERE `url` = %s''',(url,))
         r = g.cur.fetchone()
