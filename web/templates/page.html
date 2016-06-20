@@ -65,7 +65,9 @@
     {% block nav %}{% endblock nav%}
     <ul class="album_list">
     {% for album in albums -%}
-        <li>
+        <li>{% if auth %}
+            <input type="checkbox" value="{{ album.id }}">
+            {% endif %}
             <a href="{{url_for('preview')}}?url={{ album.url }}" target=_blank><img src="{{album.cover}}"></a>
             <p class="title">
             <a href="{{ album.url }}">{{ album.title }}(共{{ album.pics }}张)</a>
@@ -92,4 +94,28 @@
         </ul>
     </footer>
 </div>
+{% if auth %}
+<input type="button" name="ooxx" data-value="{{ ooxx }}" value="skip" style="width:100%">
+<script type="text/javascript">
+var get_ids = function(){
+    var els = $('input[type="checkbox"]:checked');
+    return els.map(function(){return this.value}).get().join();  
+};
+$('input[name="ooxx"]').click(function(){
+    console.log('!')
+    $.ajax({
+        url: "/skip",
+        method: "POST",
+        data: {
+            ids: get_ids(),
+            ooxx: $('input[type="button"]').data('value') ? 0 : 1,
+        },
+    })
+    .done(function(d){
+        location.reload();
+        console.log(d);
+    });
+});
+</script>
+{% endif %}
 {% endblock body -%}

@@ -1,0 +1,146 @@
+<!DOCTYPE HTMl>
+<html>
+<head>
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>>:登录</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+        body{
+            /*background: url(/static/grid.gif);*/
+        }
+        header{
+            margin: 30px auto 50px;
+            text-align: center;
+        }
+        header a{
+            margin: 0 auto;
+            font-size: 33px;
+            font-weight: bold;
+            color: rgba(81,167,232,1);
+        }
+        a,a:hover{
+            text-decoration: none;
+        }
+        #login_box{
+            background-color: #fff;
+            height: 230px;
+            width: 420px;
+            margin: 20px auto;
+            border: 1px solid rgba(0,0,0,0.5);
+            border-radius: 9px;
+            box-shadow: 0 0 7px rgba(0,0,0,0.5);
+        }
+        #login_header{
+            border-radius: 8px 8px 0 0;
+            padding: 3px 23px;
+            background: #2b404e;
+            margin-top: -3px;
+        }
+        #login_header h3{
+            color: #fff;
+            font-size: 17px;
+            margin: 9px;
+        }
+        #login_body{
+            padding: 0 18px;
+            margin: 1em 1em 0em 1em;
+        }
+        #login_body p{
+            margin: 0 auto;
+            padding: 0;
+        }
+        #login_body input:focus {
+            outline: 0;
+            border-color: rgba(82,168,236,0.8);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1),0 0 8px rgba(82,168,236,0.6);
+        }
+        .left,.right{
+            display: inline;
+        }
+        .left input{
+            padding: 5px;
+            margin: 3px 3px 10px;
+            width: 210px;
+            height: 23px;
+            font-size: 20px;
+            color: #666;
+            border: 1px solid #C3C3C3;
+            border-radius: 5px;
+            background: #FBFBFB;
+        }
+        .right {
+            position: relative;
+            left: 30px;
+        }
+        .btn{
+            cursor: pointer;
+            background-color: #4d90fe;
+            background-image: -webkit-linear-gradient(top,#4d90fe,#4787ed);
+            border: 1px solid #3079ed;
+            color: #fff;
+            border-radius: 2px;
+            font-size: 17px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            height: 33px;
+            line-height: 33px;
+            min-width: 62px;
+            outline: 0px;
+            padding: 0 8px;
+            text-shadow: -1px 1px 1px #333;
+        }
+        .btn:active {
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .error{
+            margin: 7px;
+            padding-left: 29px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #17fe80;
+            position: relative;
+            top: -1.5em;
+        }
+    </style>
+</head>
+<body>
+    <header><a href="/"></a></header>
+    <div id="login_box">
+        <div id="login_header">
+            <h3>auth</h3>
+        </div>
+        <div id="login_body">
+        {% if auth %}
+            <form action="{{ url_for('out') }}" method="post">
+                <div class="left">already auth
+                </div>
+                <div class="right">
+                    <input class="btn" type="submit" value="登出">
+                </div>
+                <input type="hidden" value="{{ next }}" name="next">
+            </form> 
+        {% else %}
+            <form action="{{ url_for('auth') }}" method="post">
+                <div class="left">
+                    <p>Username:</p>
+                    <input type="text" name="username" placeholder="username">
+                    <p>Password:</p>
+                    <input type="password" name="password" placeholder="password">
+                </div>
+                <div class="right">
+                    <input class="btn" type="submit" value="登录">
+                </div>
+                <input type="hidden" value="{{ next }}" name="next">
+            </form>
+        {% endif %}
+        </div>
+    {% if error %}
+        <p><em class="error">{{ error }}</em></p>
+    {% endif %}
+    </div>
+<script type="text/javascript"></script>
+</body>
+</html>

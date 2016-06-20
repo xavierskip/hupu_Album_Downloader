@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-from flask import g,request,jsonify,abort,session,make_response
+from flask import g,request,jsonify,abort,session,make_response,jsonify
 from flask import render_template,redirect,url_for
 from flask import Response
 #
@@ -26,9 +26,17 @@ REDIRECTURI = app.config.get('REDIRECTURI')
 # VAR
 LUSER = app.config.get('LUSER')
 LPWD = app.config.get('LPWD')
-# set secret_key
-# SECRETKEY = app.config.get('SECRETKEY')
-# app.secret_key = SECRETKEY
+
+from os import urandom
+from hashlib import sha256
+
+def encrypt_password(password, salt=None):
+    if not salt:
+        salt = urandom(8).encode('hex')
+    result = password
+    for i in range(3):
+        result = sha256(password + salt).hexdigest()
+    return result, salt
 
 def img_base64(img,ext):
     return 'data:image/%s;base64,%s' %(ext,base64.b64encode(img))
@@ -220,6 +228,30 @@ def logout():
     return redirect(url_for('index'))
 
 # views 
+@app.route('/auth/', methods=['GET','POST'])
+def auth():
+    if request.method == 'GET':
+        referrer = request.args.get('next','/')
+        auth = session.get('admin', False)
+        return render_template("login.html", next=referrer, auth=auth)
+    if request.method == 'POST': 
+        u = request.form['username']
+        p = encrypt_password(request.form['password'], app.config['SALT'])[0]
+        next = request.form['next']
+        if u == app.config['USERNAME'] and p == app.config['PASSWORD']:
+            session['admin'] = True
+            return redirect(next)
+        else:
+            return render_template('login.html', next=next,error=u'错误的用户名或者密码！')
+
+@app.route('/out', methods=['GET','POST'])
+def out():
+    if session['admin'] == True:
+        session.pop('admin', None)
+        return redirect(url_for('index'))
+    else:
+        abort(404) 
+
 @app.route('/')
 def index():
     uid = session.get('uid')
@@ -253,16 +285,26 @@ def selectUrls(urls, offset, row_count):
                 for row in g.cur.fetchall() ]
 
 
-@app.route('/albums/')
+@app.route('/albums')
 def albums():
     currentpage, offset, row_count = selectLIMIT(request)
-    g.cur.execute(''' SELECT url,title,cover,pics,getPics,times FROM albums order by logTime desc LIMIT %s,%s''',(offset, row_count))
-    albums = [dict(url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
+    ooxx = request.args.get('ooxx', 0)
+    auth = session.get('admin', False)
+    g.cur.execute('''SELECT id,url,title,cover,pics,getPics,times FROM albums \
+        where ooxx = %s order by logTime desc LIMIT %s,%s''',(ooxx, offset, row_count))
+    albums = [dict(id=row.get('id'),url=row.get('url'),title=row.get('title'),cover=row.get('cover'),pics=row.get('pics'),getPics=row.get('getPics'),times=row.get('times')) \
                 for row in g.cur.fetchall() ]
-    g.cur.execute('''SELECT count(*) from `albums`''')
-    pagenums = int( ceil( int( g.cur.fetchone().get('count(*)') ) / float(row_count) ))
+    g.cur.execute('''SELECT count(id) from `albums` where ooxx = %s''', (ooxx))
+    pagenums = int( ceil( int( g.cur.fetchone().get('count(id)') ) / float(row_count) ))
     nav = pagination(currentpage, pagenums, 2) # pagination
-    return render_template('albums.html', albums=albums, nav=nav, currentpage=currentpage+1, func=sys._getframe().f_code.co_name)
+    return render_template('albums.html', 
+        albums=albums, 
+        nav=nav, 
+        currentpage=currentpage+1, 
+        func=sys._getframe().f_code.co_name,
+        ooxx = ooxx,
+        auth = auth,
+        )
 
 @app.route('/SD/')
 def sd():
@@ -380,6 +422,20 @@ def csrf():
         # response.set_cookie('csrf','0')
         return response
     # return render_template('csrf.html')
+
+@app.route('/skip', methods=['POST'])
+def skip():
+    if session['admin']:
+        id_list = request.form.get('ids').split(',')
+        statement = 'UPDATE `albums` set ooxx=%s WHERE id in ({})'.format(','.join(['%s'] * len(id_list)))
+        args = [request.form['ooxx']]
+        args.extend(id_list)
+        g.db.cur.execute(statement, args)
+        g.db.commit()
+        return jsonify(response='ok')
+    else:
+        abort(404)
+
 # @app.route('/debug')
 # def debug():
 #     raise KeyError
