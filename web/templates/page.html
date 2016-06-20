@@ -87,7 +87,7 @@
             {%- elif n == currentpage -%}
             <li class="active" ><a href="{{url_for( func )}}?page={{n}}{% if ooxx %}&ooxx=1{% endif %}">{{n}}<span class="sr-only">(current)</span></a></li>
             {%- else -%}
-            <li><a href="{{url_for( func )}}?page={{n}}">{{n}}</a></li>
+            <li><a href="{{url_for( func )}}?page={{n}}{% if ooxx %}&ooxx=1{% endif %}">{{n}}</a></li>
             {%- endif -%}
         {%- endfor %}
         {%- endif %}
