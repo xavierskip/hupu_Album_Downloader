@@ -19,6 +19,7 @@ import sys
 from db import Database
 from web import app
 # import ipdb
+import time
 # weibo login
 APPKEY = app.config.get('APPKEY')
 APPSECRET = app.config.get('APPSECRET')
@@ -154,6 +155,7 @@ def zip():
             title = r.get('title').encode('utf-8')
             files = r.get('picsUrls').split('\n')
             fileList = []
+            a = time.time()
             for f in files:
                 name = f.split('/')[-1]
                 # url = 'http://t.vm'+url_for('static', filename=f)
@@ -161,10 +163,12 @@ def zip():
                 resp = requests.head(f)
                 size = resp.headers.get('content-length')
                 fileList.append(' '.join(['-',size,path,name]))
+            print 'zip:',time.time()-a
             fs = "\n".join(fileList)
             # print fs
             return Response(fs,
                     headers={
+                        'X-Archive-Charset': 'utf-8',
                         'X-Archive-Files': 'zip',
                         'Content-Disposition': 'attachment; filename="%s.zip"' %title
                     }
@@ -174,7 +178,22 @@ def zip():
     else:
         return abort(400)
 
-    # return "zip"  
+@app.route('/test-zip')
+def test_zip():
+    fs = [
+        '- 5517 /static/style.css style.css',
+        '- 3069 /static/main.js main.js',
+        '- 10784 /static/img/sina.png img/sina.png',
+        '- 66358 /static/img/donate.jpg img/donate.jpg',
+        '- 1381 /static/img/hupu_logo.png img/hupu_logo.png',
+        '- 28315 /static/masonry.pkgd.min.js js/masonry.js',
+        '- 6949 /static/imagesloaded.pkgd.min.js js/imagesloaded.js'
+    ]
+    return Response('\n'.join(fs),
+                    headers={
+                        'X-Archive-Files': 'zip',
+                        'Content-Disposition': 'attachment; filename="test_zip.zip"'
+                    })
 
 # weibo registry
 @app.route('/oauth')
