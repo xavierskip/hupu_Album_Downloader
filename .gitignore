@@ -1,3 +1,7 @@
 *.pyc
+
 .idea/
+
 web/config.py
+
+hupu/cookies.conf
