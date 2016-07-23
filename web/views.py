@@ -265,7 +265,7 @@ def logout():
 @app.route('/auth/', methods=['GET', 'POST'])
 def auth():
     if request.method == 'GET':
-        referrer = request.args.get('next', '/')
+        referrer = request.args.get('next', url_for('albums'))
         admin = session.get('admin', False)
         return render_template("login.html", next=referrer, auth=admin)
     if request.method == 'POST':
