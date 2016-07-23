@@ -1,13 +1,14 @@
 import pymysql.cursors
 
+
 class Database:
-    def __init__(self,host,port,user,passwd,db,charset="utf8"):
+    def __init__(self, host, port, user, passwd, db, charset="utf8"):
         self.conn = pymysql.connect(
-            host = host,
-            port = port,
-            user = user,
-            passwd = passwd,
-            db = db,
+            host=host,
+            port=port,
+            user=user,
+            passwd=passwd,
+            db=db,
             charset=charset,
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -19,19 +20,20 @@ class Database:
     def close(self):
         self.conn.close()
 
+
 def init_db(host, port, user, passwd, charset="utf8"):
     conn = pymysql.connect(
-        host = host,
-        port = port,
-        user = user,
-        passwd = passwd,
-        charset = charset
+        host=host,
+        port=port,
+        user=user,
+        passwd=passwd,
+        charset=charset
     )
     import os
-    schema = os.path.join(os.path.dirname(os.path.abspath(__file__)),'schema.sql')
+    schema = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'schema.sql')
     try:
         with conn.cursor() as cursor:
-            with open(schema,'r') as sql:
+            with open(schema, 'r') as sql:
                 for line in sql.read().split(';\n'):
                     cursor.execute(line)
         conn.commit()
@@ -41,4 +43,5 @@ def init_db(host, port, user, passwd, charset="utf8"):
 
 if __name__ == '__main__':
     from config import *
+
     init_db(HOST, PORT, DBUSER, DBPASSWD)

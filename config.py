@@ -1,8 +1,8 @@
-# DEBUG = True
-# app secret_key
+# flask config
+DEBUG = False
 SECRET_KEY = 'YouNev3rKn0w!'
-# oauth config weibo
-APPKEY = 012345
+# weibo oauth
+APPKEY = '012345'
 APPSECRET = 'xxxxxxx'
 REDIRECTURI = 'http://localhost'
 #DATEBASE
@@ -11,7 +11,6 @@ PORT = 3306
 DBUSER = 'root'
 DBPASSWD = 'root'
 DB = 'hupu'
-# VAR
-LASTDATE = '2014-10-19'
-LUSER = [username]
-LPWD = [password]
+# hupu user
+LUSER = 'username'
+LPWD = 'password'
