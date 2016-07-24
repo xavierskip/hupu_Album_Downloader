@@ -468,7 +468,7 @@ def csrf():
                                )
         response = make_response(html.encode('gb2312'))
         response.content_type = "text/html;charset=gb2312"
-        response.set_cookie('csrf', '0') # set_cookie value must be str
+        response.set_cookie('csrf', '0')  # set_cookie value must be str
         return response
     else:
         return make_response(redirect(url_for('albums')))

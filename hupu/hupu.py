@@ -59,8 +59,8 @@ class HupuAlbum(object):
         self.session.headers.update(**headers)
 
     def get(self, url, cookies):
-        ''' set requests.session cookies and headers
-        '''
+        """ set requests.session cookies and headers
+        """
         self.session.cookies.clear()  # CookieConflictError: There are multiple cookies with name
         self.session.cookies.update(cookies)
         r = self.session.get(url)
