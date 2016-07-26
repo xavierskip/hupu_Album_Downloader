@@ -17,6 +17,7 @@ import time
 import re
 from os import urandom
 from hashlib import sha256
+import threading
 
 from db import Database
 from . import app
@@ -28,6 +29,18 @@ APPSECRET = app.config.get('APPSECRET')
 REDIRECTURI = app.config.get('REDIRECTURI')
 LUSER = app.config.get('LUSER')
 LPWD = app.config.get('LPWD')
+
+
+class ThreadsTask(object):
+    def __init__(self):
+        self.result = []
+
+    def run(self, u):
+        name = u.split('/')[-1]
+        path = '/img/' + re.split('/', u, 3)[-1]
+        resp = requests.head(u)
+        size = resp.headers.get('content-length')
+        self.result.append(' '.join(['-', size, path, name]))
 
 
 def encrypt_password(password, salt=None):
@@ -156,31 +169,32 @@ def zip_mod():
     need nginx module mod_zip  https://github.com/evanmiller/mod_zip
     """
     url = request.args.get('url')
+    try:  # prevent universal crawler
+        request.cookies['csrf']
+    except:
+        return abort(403)
     if url:
         g.cur.execute(''' SELECT `title`,`picsUrls` FROM `albums` WHERE `url` = %s''', (url,))
         r = g.cur.fetchone()
         if r:
             title = r.get('title').encode('utf-8')
             files = r.get('picsUrls').split('\n')
-            file_list = []
             a = time.time()
+            tasks = ThreadsTask()
+            threads = []
             for f in files:
-                name = f.split('/')[-1]
-                # url = 'http://t.vm'+url_for('static', filename=f)
-                path = '/img/' + re.split('/', f, 3)[-1]
-                resp = requests.head(f)
-                size = resp.headers.get('content-length')
-                file_list.append(' '.join(['-', size, path, name]))
+                t = threading.Thread(target=tasks.run, args=(f,))
+                threads.append(t)
+                t.start()
+            for t in threads:
+                t.join()
+            fs = "\n".join(tasks.result)
             print 'zip:', time.time() - a
-            fs = "\n".join(file_list)
-            # print fs
-            return Response(fs,
-                            headers={
-                                'X-Archive-Charset': 'utf-8',
-                                'X-Archive-Files': 'zip',
-                                'Content-Disposition': 'attachment; filename="%s.zip"' % title
-                            }
-                            )
+            return Response(fs, headers={
+                'X-Archive-Charset': 'utf-8',
+                'X-Archive-Files': 'zip',
+                'Content-Disposition': 'attachment; filename="%s.zip"' % title
+            })
         else:
             return abort(404)
     else:
@@ -323,7 +337,7 @@ def select_urls(urls, offset, row_count):
              'getPics': row.get('getPics'), 'times': row.get('times')} for row in g.cur.fetchall()]
 
 
-@app.route('/albums')
+@app.route('/albums/')
 def albums():
     currentpage, offset, row_count = select_limit(request)
     ooxx = request.args.get('ooxx', 0)
@@ -456,9 +470,9 @@ def donate():
 
 @app.route('/csrf/')
 def csrf():
-    """if cookie csrf == 1, do csrf and set cookie csrf 0, otherwise not
+    """if cookie csrf is 1 or empty, do csrf and set cookie csrf 0, otherwise not
     """
-    csrf_int = int(request.cookies.get('csrf', 0))
+    csrf_int = int(request.cookies.get('csrf', 1))
     if csrf_int == 1:
         t = request.cookies.get('t', '')
         u = request.cookies.get('u', '')
@@ -476,7 +490,7 @@ def csrf():
 
 @app.route('/skip', methods=['POST'])
 def skip():
-    if session['admin']:
+    if session['admin'] is True:
         id_list = request.form.get('ids').split(',')
         statement = 'UPDATE `albums` set ooxx=%s WHERE id in ({})'.format(','.join(['%s'] * len(id_list)))
         args = [request.form['ooxx']]

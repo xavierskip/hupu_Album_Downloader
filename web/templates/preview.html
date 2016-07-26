@@ -156,7 +156,7 @@
 <div class="container">
     <h2><a href="{{ url }}">{{ title }}</a><small>共{{ count }}张<a href="{{url_for('albums')}}" class="glyphicon glyphicon-off" aria-hidden="true"> </a></small></h2>
     <p>
-    download: <a href="{{url_for('getalbum')}}?url={{ url }}">txt</a>|<a href="{{url_for('zip_mod')}}?url={{ url }}">zip</a>
+    download: <a href="{{url_for('getalbum')}}?url={{ url }}">txt</a>|<a href="javascript:void(0);" id="zip_a">zip</a>
     <button id="fullscreen" class="btn btn-default">全屏浏览 <span class="glyphicon glyphicon-fullscreen"></span></button>
     <p class="">
         点击图片进行浏览，鼠标左键下一张右键上一张，左右方向键翻页，ESC退出。
@@ -340,7 +340,14 @@
         if(imgid)
             view(imgid);
     })
+    // for open zip url
+    var zip_url = "{{url_for('zip_mod')}}?url={{ url }}";
+    var openurl = function(url){
+        var windowHandle = window.open(); windowHandle.location.href = url;
+    }
+    $('#zip_a').click(function(){
+        // openurl(zip_url);
+        location.href = zip_url;
+    })
 </script>
 {% endblock script %}
-</body>
-</html>
