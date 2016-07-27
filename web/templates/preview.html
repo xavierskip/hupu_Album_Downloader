@@ -347,7 +347,10 @@
     }
     $('#zip_a').click(function(){
         // openurl(zip_url);
-        location.href = zip_url;
+        var tips = "打包下载图片需要经过服务端中转,由于线路的原因,可能无法保证速度,且如果图片数量巨大将无法保证功能的正常使用。\n推荐下载图片的链接文本,然后用本地下载工具下载。\n你仍然要打包下载图片吗?";
+        if (window.confirm(tips)) {
+            location.href = zip_url;
+        }
     })
 </script>
 {% endblock script %}

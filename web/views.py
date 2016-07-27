@@ -163,7 +163,7 @@ def getalbum():
         return abort(400)
 
 
-@app.route('/zip', methods=['GET'])
+@app.route('/album/zip', methods=['GET'])
 def zip_mod():
     """
     need nginx module mod_zip  https://github.com/evanmiller/mod_zip
