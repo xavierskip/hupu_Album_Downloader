@@ -141,9 +141,17 @@ def get():
         time=time.time() - start
     )
 
+@app.route('/album/<method>')
+def download_album(method):
+    if method == "txt":
+        return down_album_urls()
+    elif method == "zip":
+        return zip_mod()
+    else:
+        return abort(404)
 
-@app.route('/getalbum', methods=['GET'])
-def getalbum():
+
+def down_album_urls():
     url = request.args.get('url')
     if url:
         g.cur.execute(''' SELECT `picsUrls`,`title` FROM `albums` WHERE `url` = %s''', (url,))
@@ -163,7 +171,6 @@ def getalbum():
         return abort(400)
 
 
-@app.route('/album/zip', methods=['GET'])
 def zip_mod():
     """
     need nginx module mod_zip  https://github.com/evanmiller/mod_zip
@@ -171,7 +178,7 @@ def zip_mod():
     url = request.args.get('url')
     try:  # prevent universal crawler
         request.cookies['csrf']
-    except:
+    except KeyError:
         return abort(403)
     if url:
         g.cur.execute(''' SELECT `title`,`picsUrls` FROM `albums` WHERE `url` = %s''', (url,))
