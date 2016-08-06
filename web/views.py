@@ -17,6 +17,7 @@ import re
 from os import urandom
 from hashlib import sha256
 import threading
+from base64 import b64encode
 
 from db import Database
 from exceptions import abort
@@ -531,3 +532,8 @@ def uflr(e):
 # def handle_key_error(e):
 #     return e, 451
     # return '%s key error' % e, 451
+
+
+@app.template_filter('b64encode')
+def base64_encode(s):
+    return b64encode(s)
