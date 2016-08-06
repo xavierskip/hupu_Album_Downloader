@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from flask import g, request, abort, session, make_response, jsonify, jsonify
-from flask import render_template, redirect, url_for
-from flask import Response
+from flask import Flask, g, request, session, make_response, jsonify,\
+    render_template, redirect, url_for, Response
 
 from hupu import HupuAlbum
 from hupu import detect_album_path
@@ -20,9 +19,13 @@ from hashlib import sha256
 import threading
 
 from db import Database
-from . import app
-
+from exceptions import abort
 # import ipdb
+
+app = Flask(__name__)
+app.config.from_object('config')
+app.config.from_pyfile('web.cfg', silent=True)
+
 
 APPKEY = app.config.get('APPKEY')
 APPSECRET = app.config.get('APPSECRET')
@@ -140,6 +143,7 @@ def get():
         pics_urls=album.pics_urls,
         time=time.time() - start
     )
+
 
 @app.route('/album/<method>')
 def download_album(method):
@@ -511,5 +515,19 @@ def skip():
 
 @app.route('/debug')
 def debug():
-    raise KeyError
-    return render_template('donate.html')
+    # abort(401)
+    abort(451)
+    # raise UnavailableForLegalReasons
+    # raise KeyError
+    # return render_template('donate.html')
+
+
+@app.errorhandler(451)
+def uflr(e):
+    return e, 451
+
+
+# @app.errorhandler(KeyError)
+# def handle_key_error(e):
+#     return e, 451
+    # return '%s key error' % e, 451
