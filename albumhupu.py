@@ -1,15 +1,23 @@
 #!/usr/bin/env python
 # coding: utf-8
-import os
-import sys
-import urllib2
 from hupu import HupuAlbum, detect_album_path, Cookie, enter_name_pwd
+import urllib2
+import sys
+import os
+import argparse
 # import ipdb
+"""
 # 普通        http://my.hupu.com/hoopchinalv/photo/a1787001.html
 # 只对好友公开 http://my.hupu.com/BelieveMyself/photo/a139390-1.html
 # 加密        http://my.hupu.com/BelieveMyself/photo/a100107-1.html
 # 由来        http://my.hupu.com/sunyatsen/photo/a135716.html
 # 空白测试     http://my.hupu.com/137262/photo/a0-1.html
+"""
+
+parser = argparse.ArgumentParser(description='download hupu.com album images')
+parser.add_argument("url", help="hupu album url", type=str)
+parser.add_argument("-p", nargs=2, metavar=('username', 'password'), help="hupu.com username and password")
+Args = parser.parse_args()
 
 
 def filter_path_char(s):
@@ -71,13 +79,12 @@ def get_album(url, username='', password=''):
 
 
 def main():
-    useage = 'Usage: python download.py <url>'
-    try:
-        url = sys.argv[1]
-    except IndexError:
-        print(useage)
-        return None
-    album = get_album(url)
+    if Args.p:
+        username, password = Args.p
+    else:
+        username = ''
+        password = ''
+    album = get_album(Args.url, username, password)
     # down album img
     if album:
         try:

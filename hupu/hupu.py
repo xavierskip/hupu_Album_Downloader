@@ -105,6 +105,10 @@ class HupuAlbum(object):
 
     def login(self, user, password):
         """try to login and update the cookie
+        at first try to use the cookie.
+        if the username not in the cookies or cookies expired
+        will require to input the hupu acount info.
+        try to login and fetch the album page one at the same time
         """
         def _try_get(this, url, cookies):
             this.first_page = this.get(url, cookies)
@@ -137,6 +141,7 @@ class HupuAlbum(object):
                 return result
             else:
                 if self.state == 403:  # maybe cookie expired and get new one
+                    print('cookies expired')
                     return _get_new_cookie(self, user, password)
                 else:  # you can't login in
                     return False
