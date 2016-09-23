@@ -1,16 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
-import re
-import requests
-from math import ceil
 from threading import Thread
+from hashlib import md5
+from math import ceil
 import ConfigParser
-# import ipdb
+import requests
 import os
+import re
+import getpass
+# import ipdb
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CookieFile = "cookies.conf"
 COOKIES = os.path.join(HERE, CookieFile)
+
+
+def enter_name_pwd():
+    name = raw_input('username:')
+    pwd = getpass.getpass()
+    return name, pwd
 
 
 def detect_album_path(album_url):
@@ -31,6 +39,7 @@ class HupuAlbum(object):
         # Album info
         self.title = ''
         self.cover = ''  # cover img url
+        self.first_page = ''  # the first get page
         self.pics = 0
         self.pages = 0
         self.page_urls = []
@@ -43,23 +52,23 @@ class HupuAlbum(object):
             self.path = match.group(1)
             self.homepage = 'http://my.hupu.com%s.html' % self.path
         else:
+            # unknow=-1 init|empty=0 succeed=1
             self.state = -1
-        # unknow=-1 init|empty=0 succeed=1
         # private=302 login_fail=403 encrypt=501
         self.state = 0
         # requests session
         self.session = requests.session()
         self.g = ''
         headers = {
-            # 'Host': 'passport.hupu.com',
-            # 'Origin': 'http://passport.hupu.com',
-            # 'Referer': 'http://passport.hupu.com/login',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.81 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2357.81 Safari/537.36'
         }
         self.session.headers.update(**headers)
+        self.login_page = 'https://passport.hupu.com/pc/login?project=www&from=pc'
+        self.login_url = 'https://passport.hupu.com/pc/login/member.action'
+
 
     def get(self, url, cookies):
-        """ set requests.session cookies and headers
+        """ used to get page content
         """
         self.session.cookies.clear()  # CookieConflictError: There are multiple cookies with name
         self.session.cookies.update(cookies)
@@ -77,59 +86,65 @@ class HupuAlbum(object):
             self.state = 1
             return r.text
 
-    def getCookie(self, url, payload):
-        r = self.session.post(url, payload)
+    def get_cookie(self, payload):
+        self.session.get(self.login_page)  # get some cookie
+        r = self.session.post(self.login_url, payload)
+        json = r.json()
+        if json['code'] != 1000:
+            print(json['msg'])
         cookies = r.cookies
-        if cookies.get('u') and cookies.get('ua'):
-            for k in ['u', 'ua']:
-                self.cookieconfig.set(payload['username'], k, cookies.get(k))
-            self.cookieconfig.save()  # save cookie
-            return cookies
-        else:
-            self.state = 403  # 登录失败
-            return False
+        must_key = ['u','ua','us']
+        cookie_keys = cookies.keys()
+        for k in must_key:
+            if k not in cookie_keys:
+                return False
+        for k in cookie_keys:  # or must_key
+            self.cookieconfig.set(payload['username'], k, cookies.get(k))
+        self.cookieconfig.save()
+        return cookies
 
     def login(self, user, password):
-        login = "http://passport.hupu.com/login"
-        payload = {
-            'username': user,
-            'password': password,
-            'rememberme': 1,
-            'charset': 'utf-8',
-            'jumpurl': '/',
-            'mode': 'email'
-        }
-        self.cookieconfig = Cookie()
-        if self.cookieconfig.has_user(user):
-            loginCookie = self.cookieconfig.getcookies(user)
-            self.content = self.get(self.homepage, loginCookie)
-            if self.content:
-                self.g += self.content  # album first page
+        """try to login and update the cookie
+        """
+        def _try_get(this, url, cookies):
+            this.first_page = this.get(url, cookies)
+            if this.first_page:
+                this.g += this.first_page
                 return True
             else:
-                if self.state == 403:  # expired cookie then login fail
-                    loginCookie = self.getCookie(login, payload)
-                    if not loginCookie:
-                        self.cookieconfig.remove(user)
-                        return False  # login fail
-                        # if get cookie than skip the judgment
-                else:
-                    # login succeed but can't access the album
+                return False
+
+        def _get_new_cookie(this, user, password=''):
+            if not password:  # if you don't pass the password, sould enter it manually
+                user, password = enter_name_pwd()
+            data = {
+                'username': user,
+                'password': md5(password).hexdigest()
+            }
+            new_cookie = this.get_cookie(data)
+            if new_cookie:
+                return _try_get(this, this.homepage, new_cookie)
+            else:
+                this.cookieconfig.remove(user)
+                self.state = 403  # change self.state
+                return False
+
+        self.cookieconfig = Cookie()
+        if self.cookieconfig.has_user(user):
+            cookie = self.cookieconfig.getcookies(user)
+            result = _try_get(self, self.homepage, cookie)
+            if result:
+                return result
+            else:
+                if self.state == 403:  # maybe cookie expired and get new one
+                    return _get_new_cookie(self, user, password)
+                else:  # you can't login in
                     return False
         else:
-            loginCookie = self.getCookie(login, payload)
-            if not loginCookie:
-                return False  # login fail
-                # if get cookie than skip the judgment
-        self.content = self.get(self.homepage, loginCookie)
-        if self.content:
-            self.g += self.content
-            return True
-        else:
-            return False
+            return _get_new_cookie(self, user, password)
 
     def get_info(self):
-        page = self.content
+        page = self.first_page
         # get album title
         title = re.search('<title>(.+)</title>', page)
         if title:

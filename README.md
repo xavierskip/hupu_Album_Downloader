@@ -1,12 +1,13 @@
 虎扑网相册下载工具
 =====================
 
-虎扑相册现在需要登录才能浏览，所以下载工具需要指定能够登录的虎扑帐号。
+* 虎扑相册现在需要登录才能浏览，所以下载工具需要指定能够登录的虎扑帐号。*
 
 `download.py` 是直接运行的脚本。
 
-uasge：`python download.py  <你想要下载的虎扑相册的url> <用户名> <密码>`
+uasge：`python download.py  <你想要下载的虎扑相册的url>`
 
+第一次使用时会提示你输入虎扑帐号用户名和密码,登录后记录此帐号的cookie,以后的登录不需要输入帐号信息。cookie过期后会提示你重新输入帐号信息。
 (注意此模块`hupu`会在自己的目录下记录登录帐号的cookies)
 
 `runserver.py` 文件是运行 web服务用来在网络上搭建此工具。
@@ -15,10 +16,10 @@ uasge：`python download.py  <你想要下载的虎扑相册的url> <用户名> 
 
 ``` requirements.txt
 # 抓取部分
-requests==2.2.1 
+requests
 # 网络服务部分
-Flask==0.10.1
-PyMySQL==0.6.6
+Flask
+PyMySQL
 ```
 
 1. 先运行 `python web/db.py` 初始化数据库   
@@ -28,7 +29,6 @@ PyMySQL==0.6.6
 
 ``` web/config.py
 # flask 的配置文件
-DEBUG = True
 SECRET_KEY = 'YouNev3rKn0w!'
 # 新浪微博连接登录的配置
 APPKEY = 012345
@@ -40,9 +40,7 @@ PORT = 3306
 DBUSER = 'root'
 DBPASSWD = 'root'
 DB = 'hupu'
-# 网站页面下显示的最近更新时间
-LASTDATE = '2014-10-19'
 # 抓取相册内容需要指定默认的虎扑帐号
-LUSER = [username]
-LPWD = [password]
+LUSER = <username>
+LPWD = <password>
 ```
