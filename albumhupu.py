@@ -2,7 +2,6 @@
 # coding: utf-8
 from hupu import HupuAlbum, detect_album_path, Cookie, enter_name_pwd
 import urllib2
-import sys
 import os
 import argparse
 # import ipdb
@@ -15,8 +14,10 @@ import argparse
 """
 
 parser = argparse.ArgumentParser(description='download hupu.com album images')
-parser.add_argument("url", help="hupu album url", type=str)
-parser.add_argument("-p", nargs=2, metavar=('username', 'password'), help="hupu.com username and password")
+parser.add_argument('url', help="hupu album url", type=str)
+parser.add_argument('-u', nargs=2, metavar=('username', 'password'), help="hupu.com username and password")
+parser.add_argument('-p', nargs=1, metavar='path', help='album folder under the path')
+parser.add_argument('-f', nargs=1, metavar='folder', help='album folder name')
 Args = parser.parse_args()
 
 
@@ -26,7 +27,14 @@ def filter_path_char(s):
     }
     for k, v in illegal_chars.iteritems():
         s = s.replace(k, v)
-    return s
+    return s.strip()
+
+
+def mkdir(abspath, name):
+    directory = os.path.join(abspath, name)
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    return directory
 
 
 def save_imgs(urls, path, n):
@@ -79,29 +87,36 @@ def get_album(url, username='', password=''):
 
 
 def main():
-    if Args.p:
-        username, password = Args.p
+    if Args.u:
+        username, password = Args.u
     else:
         username = ''
         password = ''
     album = get_album(Args.url, username, password)
+    if Args.f:
+        foldername = Args.f[0]
+    else:
+        foldername = filter_path_char(album.title)
+    if Args.p:
+        abspath = Args.p[0]
+    else:
+        abspath = os.getcwd()
     # down album img
     if album:
+        print('创建"%s"文件夹' % foldername)
         try:
-            foldername = filter_path_char(album.title)
-            print('创建"%s"文件夹' % foldername)
-            os.mkdir(foldername)
+            path = mkdir(abspath, foldername)
         except OSError as e:
             print('创建文件夹失败')
             raise e
-        urls_file = os.path.join(foldername, 'urls')
+        urls_file = os.path.join(path, 'urls')
         with open(urls_file, 'w') as f:
             f.write(album.pics_urls)
             print('图片url写入完成')
         print('{}{}{}'.format('=' * 10, '开始下载图片', '=' * 10))
-        wget = os.system('wget -N -i "%s" -P "%s" ' % (urls_file, foldername))
+        wget = os.system('wget -N -i "%s" -P "%s" ' % (urls_file, path))
         if wget == 1:  # if you don't have wget
-            save_imgs(album.pics_urls, foldername, album.get_pics)
+            save_imgs(album.pics_urls, path, album.get_pics)
         return 1
     else:
         return 0
