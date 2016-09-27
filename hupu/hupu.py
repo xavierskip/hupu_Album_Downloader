@@ -8,6 +8,7 @@ import requests
 import os
 import re
 import getpass
+import readline
 # import ipdb
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -66,7 +67,6 @@ class HupuAlbum(object):
         self.login_page = 'https://passport.hupu.com/pc/login?project=www&from=pc'
         self.login_url = 'https://passport.hupu.com/pc/login/member.action'
 
-
     def get(self, url, cookies):
         """ used to get page content
         """
@@ -93,7 +93,7 @@ class HupuAlbum(object):
         if json['code'] != 1000:
             print(json['msg'])
         cookies = r.cookies
-        must_key = ['u','ua','us']
+        must_key = ['u', 'ua', 'us']
         cookie_keys = cookies.keys()
         for k in must_key:
             if k not in cookie_keys:

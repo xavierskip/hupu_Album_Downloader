@@ -30,8 +30,7 @@ def filter_path_char(s):
     return s.strip()
 
 
-def mkdir(abspath, name):
-    directory = os.path.join(abspath, name)
+def mkdir(directory):
     if not os.path.exists(directory):
         os.mkdir(directory)
     return directory
@@ -103,11 +102,12 @@ def main():
         abspath = os.getcwd()
     # down album img
     if album:
-        print('创建"%s"文件夹' % foldername)
+        print('创建文件夹"%s"' % foldername)
+        directory = os.path.join(abspath, foldername)
         try:
-            path = mkdir(abspath, foldername)
+            path = mkdir(directory)
         except OSError as e:
-            print('创建文件夹失败')
+            print('创建文件夹"%s"失败' % directory)
             raise e
         urls_file = os.path.join(path, 'urls')
         with open(urls_file, 'w') as f:
