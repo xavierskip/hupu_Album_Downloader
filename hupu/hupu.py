@@ -16,6 +16,10 @@ CookieFile = "cookies.conf"
 COOKIES = os.path.join(HERE, CookieFile)
 
 
+def nohttps(s):
+    return re.sub('^https://', 'http://', s)
+
+
 def enter_name_pwd():
     name = raw_input('username:')
     pwd = getpass.getpass()
@@ -157,7 +161,7 @@ class HupuAlbum(object):
         # album cover
         cover = re.search('class="cover"><img src="(.+?)"', page)
         if cover:
-            self.cover = cover.group(1)
+            self.cover = nohttps(cover.group(1))
         # get album pic num
         pics = re.search(u'共(\d+)张照片', page)
         if pics:
@@ -187,7 +191,7 @@ class HupuAlbum(object):
         # filter img
         img_list = re.findall('<span>.+?<img src="(.+?)"', self.g)
         self.get_pics = len(img_list)
-        img_list = map(lambda x: re.sub('^https://', 'http://', x), img_list)
+        img_list = map(nohttps, img_list)
         self.pics_urls = re.sub('small\.', 'big.', '\n'.join(img_list))
         # clear g ! important !!! 
         # HupuAlbum.g = ''
