@@ -23,7 +23,7 @@ def enter_name_pwd():
 
 
 def detect_album_path(album_url):
-    match = re.match('http://my\.hupu\.com(/[\S]+?/photo/a[\d]+?)(?:\-[\d]+\.html|\.html)', album_url)
+    match = re.match('^https?://my\.hupu\.com(/[\S]+?/photo/a[\d]+?)(?:\-[\d]+\.html|\.html)', album_url)
     if match:
         path = match.group(1)
         homepage = 'http://my.hupu.com%s.html' % path
