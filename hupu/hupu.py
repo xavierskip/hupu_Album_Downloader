@@ -48,7 +48,7 @@ class HupuAlbum(object):
         self.get_pics = 0
         self.pics_urls = ''
         # Album path
-        match = re.match('http://my\.hupu\.com(/[\S]+?/photo/a[\d]+?)(?:\-[\d]+\.html|\.html)', self.url)
+        match = re.match('^https?://my\.hupu\.com(/[\S]+?/photo/a[\d]+?)(?:\-[\d]+\.html|\.html)', self.url)
         if match:
             self.path = match.group(1)
             self.homepage = 'http://my.hupu.com%s.html' % self.path
