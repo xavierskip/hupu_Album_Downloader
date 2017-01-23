@@ -187,7 +187,8 @@ class HupuAlbum(object):
         # filter img
         img_list = re.findall('<span>.+?<img src="(.+?)"', self.g)
         self.get_pics = len(img_list)
-        self.pics_urls = re.sub('small.', 'big.', '\n'.join(img_list))
+        img_list = map(lambda x: re.sub('^https://', 'http://', x), img_list)
+        self.pics_urls = re.sub('small\.', 'big.', '\n'.join(img_list))
         # clear g ! important !!! 
         # HupuAlbum.g = ''
         return self.pics_urls
